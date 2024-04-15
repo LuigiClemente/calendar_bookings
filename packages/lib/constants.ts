@@ -62,13 +62,13 @@ export const HOSTED_CAL_FEATURES = process.env.NEXT_PUBLIC_HOSTED_CAL_FEATURES |
 
 /** @deprecated use `WEBAPP_URL` */
 export const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_WEBAPP_URL || `https://${process.env.VERCEL_URL}`;
-export const LOGO = "/gutricious.svg";
-export const LOGO_ICON = "/gutriciousico.svg";
+export const LOGO = "/gutriciouslogo.svg";
+export const LOGO_ICON = "/gutriciouslogo.svg";
 export const AVATAR_FALLBACK = "/avatar.svg";
 export const FAVICON_16 = "/gutriciousico.png";
 export const FAVICON_32 = "/gutriciousico.png";
 export const APPLE_TOUCH_ICON = "/gutriciousico.png";
-export const MSTILE_ICON = "/gutriciousico.svg";
+export const MSTILE_ICON = "/gutriciouslogo.svg";
 export const ANDROID_CHROME_ICON_192 = "/gutriciousico.png";
 export const ANDROID_CHROME_ICON_256 = "/gutriciousico.png";
 export const ROADMAP = "https://cal.com/roadmap";
