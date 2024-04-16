@@ -1,6 +1,5 @@
 import type { User as UserAuth } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { Dispatch, ReactElement, ReactNode, SetStateAction } from "react";
@@ -43,9 +42,6 @@ import {
   APP_NAME,
   DESKTOP_APP_LINK,
   ENABLE_PROFILE_SWITCHER,
-  IS_VISUAL_REGRESSION_TESTING,
-  JOIN_DISCORD,
-  ROADMAP,
   TOP_BANNER_HEIGHT,
   WEBAPP_URL,
 } from "@calcom/lib/constants";
@@ -65,7 +61,6 @@ import {
   Avatar,
   Button,
   ButtonOrLink,
-  Credits,
   Dropdown,
   DropdownItem,
   DropdownMenuContent,
@@ -83,16 +78,15 @@ import {
   useCalcomTheme,
   type IconName,
 } from "@calcom/ui";
-import { Discord } from "@calcom/ui/components/icon/Discord";
 
 import { useOrgBranding } from "../ee/organizations/context/provider";
 import FreshChatProvider from "../ee/support/lib/freshchat/FreshChatProvider";
 import { TeamInviteBadge } from "./TeamInviteBadge";
 
 // need to import without ssr to prevent hydration errors
-const Tips = dynamic(() => import("@calcom/features/tips").then((mod) => mod.Tips), {
-  ssr: false,
-});
+// const Tips = dynamic(() => import("@calcom/features/tips").then((mod) => mod.Tips), {
+//   ssr: false,
+// });
 
 /* TODO: Migate this */
 
@@ -517,7 +511,7 @@ function UserDropdown({ small }: UserDropdownProps) {
                   </DropdownItem>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <DropdownItem
                     CustomStartIcon={<Discord className="text-default h-4 w-4" />}
                     target="_blank"
@@ -525,12 +519,12 @@ function UserDropdown({ small }: UserDropdownProps) {
                     href={JOIN_DISCORD}>
                     {t("join_our_discord")}
                   </DropdownItem>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                </DropdownMenuItem> */}
+                {/* <DropdownMenuItem>
                   <DropdownItem StartIcon="map" target="_blank" href={ROADMAP}>
                     {t("visit_roadmap")}
                   </DropdownItem>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem>
                   <DropdownItem
                     type="button"
@@ -979,7 +973,7 @@ function SideBar({ bannersHeight, user }: SideBarProps) {
         </div>
 
         <div>
-          <Tips />
+          {/* <Tips /> */}
           {bottomNavItems.map((item, index) => (
             <Tooltip side="right" content={t(item.name)} className="lg:hidden" key={item.name}>
               <ButtonOrLink
@@ -1015,7 +1009,7 @@ function SideBar({ bannersHeight, user }: SideBarProps) {
               </ButtonOrLink>
             </Tooltip>
           ))}
-          {!IS_VISUAL_REGRESSION_TESTING && <Credits />}
+          {/* {!IS_VISUAL_REGRESSION_TESTING && <Credits />} */}
         </div>
       </aside>
     </div>
@@ -1160,6 +1154,7 @@ export const MobileNavigationMoreItems = () => (
 function ProfileDropdown() {
   const { update, data: sessionData } = useSession();
   const { data } = trpc.viewer.me.useQuery();
+  console.log(data);
   const [menuOpen, setMenuOpen] = useState(false);
 
   if (!data || !ENABLE_PROFILE_SWITCHER || !sessionData) {
