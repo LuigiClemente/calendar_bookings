@@ -12,8 +12,6 @@ import { Meta, WizardForm } from "@calcom/ui";
 
 import PageWrapper from "@components/PageWrapper";
 import { AdminUserContainer as AdminUser } from "@components/setup/AdminUser";
-import ChooseLicense from "@components/setup/ChooseLicense";
-import EnterpriseLicense from "@components/setup/EnterpriseLicense";
 
 import { getServerSideProps } from "@server/lib/setup/getServerSideProps";
 
@@ -56,56 +54,57 @@ export function Setup(props: inferSSRProps<typeof getServerSideProps>) {
         />
       ),
     },
-    {
-      title: t("choose_a_license"),
-      description: t("choose_license_description"),
-      content: (setIsPending) => {
-        return (
-          <ChooseLicense
-            id="wizard-step-2"
-            name="wizard-step-2"
-            value={value}
-            onChange={setValue}
-            onSubmit={() => {
-              setIsPending(true);
-              setStep(3);
-            }}
-          />
-        );
-      },
-    },
+    // {
+    //   title: t("choose_a_license"),
+    //   description: t("choose_license_description"),
+    //   content: (setIsPending) => {
+    //     return (
+    //       <ChooseLicense
+    //         id="wizard-step-2"
+    //         name="wizard-step-2"
+    //         value={value}
+    //         onChange={setValue}
+    //         onSubmit={() => {
+    //           setIsPending(true);
+    //           setStep(3);
+    //         }}
+    //       />
+    //     );
+    //   },
+    // },
   ];
 
-  steps.push({
-    title: t("step_enterprise_license"),
-    description: t("step_enterprise_license_description"),
-    content: (setIsPending) => {
-      const currentStep = 3;
-      return (
-        <EnterpriseLicense
-          id={`wizard-step-${currentStep}`}
-          name={`wizard-step-${currentStep}`}
-          onSubmit={() => {
-            setIsPending(true);
-          }}
-          onSuccess={() => {
-            setStep(currentStep + 1);
-          }}
-          onSuccessValidate={() => {
-            setIsEnabledEE(true);
-          }}
-        />
-      );
-    },
-    isEnabled: isEnabledEE,
-  });
+  // steps.push({
+  //   title: t("step_enterprise_license"),
+  //   description: t("step_enterprise_license_description"),
+  //   content: (setIsPending) => {
+  //     const currentStep = 3;
+  //     return (
+  //       <EnterpriseLicense
+  //         id={`wizard-step-${currentStep}`}
+  //         name={`wizard-step-${currentStep}`}
+  //         onSubmit={() => {
+  //           setIsPending(true);
+  //         }}
+  //         onSuccess={() => {
+  //           setStep(currentStep + 1);
+  //         }}
+  //         onSuccessValidate={() => {
+  //           setIsEnabledEE(true);
+  //         }}
+  //       />
+  //     );
+  //   },
+  //   isEnabled: isEnabledEE,
+  // });
 
   steps.push({
     title: t("enable_apps"),
     description: t("enable_apps_description", { appName: APP_NAME }),
     contentClassname: "!pb-0 mb-[-1px]",
     content: (setIsPending) => {
-      const currentStep = isFreeLicense ? 3 : 4;
+      // const currentStep = isFreeLicense ? 3 : 4;
+      const currentStep = 2;
       return (
         <AdminAppsList
           id={`wizard-step-${currentStep}`}
