@@ -99,3 +99,43 @@ flowchart TD;
 
 ```
 
+### Configuration Steps:
+
+1. **Identify Public Endpoints**: List out all the specific API paths (URLs) that belong to the open website and customer sections of your app.
+
+2. **Configure uri-blocker plugin**: In APISIX, configure the uri-blocker plugin to create rules that allow requests matching the public endpoint paths. You can use regular expressions for flexibility.
+
+Example Configuration (assuming public paths start with "/public" and "/customer"):
+
+```nginx
+location / {
+  # Allow requests to public and customer paths
+  uri_blocker {
+    deny_uri = ["^/(?!(public|customer)).*", "/internal/.*"]
+  }
+  # Your routes and other configuration here...
+}
+```
+
+Explanation:
+
+- `location /` applies the rule to all incoming requests.
+- `uri_blocker` defines the blocking rule.
+- `deny_uri` specifies patterns to deny.
+  - `^/(?!(public|customer)).*` - This regex matches any path that doesn't start with "/public" or "/customer".
+  - `/internal/.*` - This blocks any path that starts with "/internal/" (assuming these are internal API endpoints).
+
+Aim:
+
+- Fine-grained control over exposed endpoints.
+- No need to manage user IPs.
+
+Considerations:
+
+- Requires understanding regular expressions for effective configuration.
+- Double-check your patterns to avoid accidentally blocking legitimate requests.
+
+Additional Tips:
+
+- You can create separate routes or services in APISIX for public and internal API sections for better organization.
+- Remember, APISIX acts as a first line of defense.
