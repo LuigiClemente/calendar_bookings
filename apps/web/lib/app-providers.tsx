@@ -147,7 +147,7 @@ const CalcomThemeProvider = (props: CalcomThemeProps) => {
   const themeProviderProps = getThemeProviderProps({ props, isEmbedMode, embedNamespace });
 
   return (
-    <ThemeProvider {...themeProviderProps}>
+    <ThemeProvider {...themeProviderProps} defaultTheme="light">
       {/* Embed Mode can be detected reliably only on client side here as there can be static generated pages as well which can't determine if it's embed mode at backend */}
       {/* color-scheme makes background:transparent not work in iframe which is required by embed. */}
       {typeof window !== "undefined" && !isEmbedMode && (
