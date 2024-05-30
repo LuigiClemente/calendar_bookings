@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { SAMLLogin } from "@calcom/features/auth/SAMLLogin";
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import { HOSTED_CAL_FEATURES, WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
 import { getSafeRedirectUrl } from "@calcom/lib/getSafeRedirectUrl";
@@ -70,8 +69,6 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const errorMessages: { [key: string]: string } = {
-    // [ErrorCode.SecondFactorRequired]: t("2fa_enabled_instructions"),
-    // Don't leak information about whether an email is registered or not
     [ErrorCode.IncorrectEmailPassword]: t("incorrect_email_password"),
     [ErrorCode.IncorrectTwoFactorCode]: `${t("incorrect_2fa_code")} ${t("please_try_again")}`,
     [ErrorCode.InternalServerError]: `${t("something_went_wrong")} ${t("please_try_again_and_contact_us")}`,
@@ -179,7 +176,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
       <AuthContainer
         title={t("login")}
         description={t("login")}
-        showLogo
+        showLogo={false}
         heading={twoFactorRequired ? t("2fa_code") : t("welcome_back")}
         footerText={
           twoFactorRequired
@@ -236,7 +233,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
               </Button>
             </div>
           </form>
-          {!twoFactorRequired && (
+          {/* {!twoFactorRequired && (
             <>
               {(isGoogleLoginEnabled || displaySSOLogin) && <hr className="border-subtle my-8" />}
               <div className="space-y-3">
@@ -263,7 +260,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
                 )}
               </div>
             </>
-          )}
+          )} */}
         </FormProvider>
       </AuthContainer>
       <AddToHomescreen />

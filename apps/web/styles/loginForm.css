@@ -1,0 +1,58 @@
+
+@font-face {
+    font-family: "CeraPro";
+    src: url('/login-font/CeraProBlack.otf');
+    font-weight: 900; /* Black weight */
+    font-style: normal;
+  }
+  
+  
+  @font-face {
+    font-family: "CeraPro";
+    src: url('/login-font/CeraProBold.otf');
+    font-weight: bold; /* Bold weight */
+    font-style: normal;
+  }
+  
+  
+  @font-face {
+    font-family: "CeraPro";
+    src: url('/login-font/CeraPro-Regular-test.ttf');
+    font-weight: 500; /* Medium weight */
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Futura";
+    src: url('/login-font/FuturaBold.otf');
+    font-weight: 700; 
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "KingsCaslon";
+    src: url('/login-font/KingsCaslon_Trial_Bd.ttf');
+    font-weight: 700; 
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Univers";
+    src: url('/login-font/UniversBold.ttf');
+    font-weight: 700; 
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "CeraPro";
+    src: url('/login-font/CeraProLight.otf');
+    font-weight: 300; /* Light weight */
+    font-style: normal;
+  }
+  
+  
+  @font-face {
+    font-family: "CeraPro2";
+    src: url('/login-font/Cera Pro Regular.otf');
+    
+  }
+
+  .cera-pro-font * {
+    font-family: "CeraPro", sans-serif !important;
+  }

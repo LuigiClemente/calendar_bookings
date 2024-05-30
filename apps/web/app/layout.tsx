@@ -9,6 +9,7 @@ import { getLocale } from "@calcom/features/auth/lib/getLocale";
 import { prepareRootMetadata } from "@lib/metadata";
 
 import "../styles/globals.css";
+import "../styles/loginForm.css";
 
 const interFont = Inter({ subsets: ["latin"], variable: "--font-inter", preload: true, display: "swap" });
 const calFont = localFont({

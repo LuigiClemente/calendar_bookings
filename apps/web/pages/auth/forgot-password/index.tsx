@@ -89,7 +89,7 @@ export default function ForgotPassword(props: inferSSRProps<typeof getServerSide
 
   return (
     <AuthContainer
-      showLogo
+      showLogo={false}
       title={!success ? t("forgot_password") : t("reset_link_sent")}
       heading={!success ? t("forgot_password") : t("reset_link_sent")}
       description={t("request_password_reset")}
