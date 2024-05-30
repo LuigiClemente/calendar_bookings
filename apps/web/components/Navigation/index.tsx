@@ -34,13 +34,10 @@ export const Navigation = ({
 }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  // const localActive = useLocale();
-  // const [selectedLanguage, setSelectedLanguage] = useState<LocalActiveType>(localActive as any);
   const selectedLanguage = "en";
   const [langBtnState, setLangBtnState] = useState(false);
 
-  // const t = useTranslations("Index");
-  const t = (text: any) => "";
+  const t = (text: string) => text; // Temporary translation function
   const languageRoutes: any = {
     en: "/home",
     de: "/startseite",
@@ -50,16 +47,17 @@ export const Navigation = ({
     pt: "/pagina-inicial",
     it: "/casa",
   };
+
   const changeLanguage = (langCode: LocalActiveType) => {
     const route = languageRoutes[langCode];
     if (route) {
-      // setSelectedLanguage(langCode);
       document.cookie = `NEXT_LOCALE=${langCode}; path=/; max-age=31536000; samesite=lax`;
       router.push(route);
     }
   };
+
   return (
-    <nav className={"mx-auto flex w-full items-center  justify-between pr-[10px] " + "dark"}>
+    <nav className="dark mx-auto flex w-full items-center justify-between pr-[10px]">
       <div className="relative font-extrabold text-black">
         <Image
           loader={({ src }) => src}
@@ -67,10 +65,10 @@ export const Navigation = ({
           height={70}
           width={120}
           objectFit="contain"
-          className=" h-[110px] w-[120px] object-contain 2xl:h-[100px] 2xl:w-[150px]"
+          className="h-[110px] w-[120px] object-contain 2xl:h-[100px] 2xl:w-[150px]"
           src={`${IMAGE_URL}/assets/day/logo.webp`}
         />
-        <div className="absolute top-0   z-20 h-full w-full cursor-pointer rounded-full" />
+        <div className="absolute top-0 z-20 h-full w-full cursor-pointer rounded-full" />
       </div>
 
       <div className="mr-[10px] flex items-center gap-[25px]">
@@ -90,7 +88,7 @@ export const Navigation = ({
                   <svg height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path
                       clipRule="evenodd"
-                      d="M20.54 7.225 9.58 18.185l-6.12-6.12 1.415-1.414 4.705 4.706 9.546-9.546z"
+                      d="M20.54 7.225L9.58 18.185l-6.12-6.12 1.415-1.414 4.705 4.706 9.546-9.546z"
                     />
                   </svg>
                 </div>
@@ -100,9 +98,7 @@ export const Navigation = ({
           <div className={`lang-btn relative cursor-pointer ${isLangBtnHovered ? "hovered" : ""}`}>
             <div
               className="inner-lang-btn absolute z-20 h-full w-full cursor-pointer"
-              onMouseEnter={() => {
-                setIsLangBtnHovered(true);
-              }}
+              onMouseEnter={() => setIsLangBtnHovered(true)}
               onMouseLeave={() => setIsLangBtnHovered(false)}
               onClick={() => {
                 if (!langBtnState) {
@@ -114,20 +110,17 @@ export const Navigation = ({
                 }
               }}
             />
-
             <CiGlobe color="#000000" />
           </div>
         </Popover>
-        <div className={`relative ${"dark"} hamburger-container ${navOpen ? "navOpen" : ""}`}>
+        <div className={`hamburger-container dark relative ${navOpen ? "navOpen" : ""}`}>
           <div
-            className="extra-nav absolute  z-20 h-full w-full rounded-full duration-[800ms]"
-            onMouseEnter={() => {
-              setIsHovered(true);
-            }}
+            className="extra-nav absolute z-20 h-full w-full rounded-full duration-[800ms]"
+            onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => setNavOpen(!navOpen)}
           />
-          <button className={` menu__icon  ${isHovered || navOpen ? "hovered-class" : ""}`}>
+          <button className={`menu__icon ${isHovered || navOpen ? "hovered-class" : ""}`}>
             <span />
             <span />
           </button>
@@ -135,22 +128,18 @@ export const Navigation = ({
 
         <div className={classNames("navigation", "dark")}>
           <input type="checkbox" className="navigation__checkbox" checked={navOpen} id="navi-toggle" />
-
           <div className={`navigation__background ${navOpen ? "navOpen" : ""}`}>&nbsp;</div>
-
           <nav className="navigation__nav">
             <div className="custom-container flex min-h-[130px] items-center justify-between">
               <div />
-              <div className={`relative ${"dark"} hamburger-container ${navOpen ? "navOpen" : ""}`}>
+              <div className={`hamburger-container dark relative ${navOpen ? "navOpen" : ""}`}>
                 <div
-                  className="extra-nav absolute  z-20 h-20 w-20 rounded-full duration-[800ms]"
-                  onMouseEnter={() => {
-                    setIsHovered(true);
-                  }}
+                  className="extra-nav absolute z-20 h-20 w-20 rounded-full duration-[800ms]"
+                  onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
                   onClick={() => setNavOpen(!navOpen)}
                 />
-                <button className={` menu__icon mr-8  ${isHovered || navOpen ? "hovered-class" : ""}`}>
+                <button className={`menu__icon mr-8 ${isHovered || navOpen ? "hovered-class" : ""}`}>
                   <span />
                   <span />
                 </button>
@@ -169,9 +158,7 @@ export const Navigation = ({
               <Link href={routes[selectedLanguage]["terms-of-use"]} className="navigation__item inline-block">
                 <span className="navigation__link">{t("Terms_of_Service")}</span>
               </Link>
-              <Link
-                href={routes[selectedLanguage]["cookies"] as any}
-                className="navigation__item inline-block">
+              <Link href={routes[selectedLanguage]["cookies"]} className="navigation__item inline-block">
                 <span className="navigation__link">{t("Cookies_Policy")}</span>
               </Link>
               <Link href={routes[selectedLanguage]["privacy"]} className="navigation__item inline-block">
