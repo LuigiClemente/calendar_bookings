@@ -1,4 +1,28 @@
 {
+"welcomeBack": "Bienvenue de nouveau",
+"forgotPassword": "Mot de passe oublié",
+"forgetPasswordPage": {
+  "title": "Mot de passe oublié",
+  "emailAddress": "Adresse e-mail: nom@entreprise.com",
+  "sendResetEmail": "Envoyer l'e-mail de réinitialisation",
+  "backToSignIn": "Retour à la connexion"
+},
+"Home": "Accueil",
+"About_Us": "À Propos de Nous",
+"Our_Studies": "Nos Études",
+"Terms_of_Service": "Conditions d'Utilisation",
+"Cookies_Policy": "Politique de Cookies",
+"Privacy_Policy": "Politique de Confidentialité",
+"welcomeOrWelcomeBackPage": {
+  "welcomeBack": "Bienvenue de nouveau",
+  "yourEmail": "Votre email",
+  "emailPlaceholder": "nom@entreprise.com",
+  "password": "Mot de passe",
+  "passwordPlaceholder": "Entrez votre mot de passe",
+  "forgotPassword": "Mot de passe oublié?",
+  "signIn": "Se connecter"
+},
+   
   "identity_provider": "Fournisseur d'identité",
   "trial_days_left": "Il vous reste $t(day, {\"count\": {{days}} }) pour votre essai Pro",
   "day_one": "{{count}} jour",

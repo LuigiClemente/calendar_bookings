@@ -1,4 +1,30 @@
 {
+
+
+  "welcomeBack": "Bentornato",
+  "forgotPassword": "Password dimenticata",
+  "forgetPasswordPage": {
+    "title": "Password dimenticata",
+    "emailAddress": "Indirizzo email: nome@azienda.com",
+    "sendResetEmail": "Invia email di reset",
+    "backToSignIn": "Torna al login"
+  },
+  "Home": "Home",
+  "About_Us": "Chi Siamo",
+  "Our_Studies": "I Nostri Studi",
+  "Terms_of_Service": "Termini di Servizio",
+  "Cookies_Policy": "Politica sui Cookie",
+  "Privacy_Policy": "Politica sulla Privacy",
+  "welcomeOrWelcomeBackPage": {
+    "welcomeBack": "Bentornato",
+    "yourEmail": "La tua email",
+    "emailPlaceholder": "nome@azienda.com",
+    "password": "Password",
+    "passwordPlaceholder": "Inserisci la tua password",
+    "forgotPassword": "Password dimenticata?",
+    "signIn": "Accedi"
+  }
+    ,
   "identity_provider": "Provider di identità",
   "trial_days_left": "Ti rimangono $t(day, {\"count\": {{days}} }) di prova con il piano PRO",
   "day_one": "{{count}} giorno",

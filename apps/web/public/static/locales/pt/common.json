@@ -1,4 +1,29 @@
 {
+
+  "welcomeBack": "Bem-vindo de volta",
+"forgotPassword": "Esqueci-me da palavra-passe",
+"forgetPasswordPage": {
+  "title": "Esqueci-me da palavra-passe",
+  "emailAddress": "Endereço de e-mail: nome@empresa.com",
+  "sendResetEmail": "Enviar e-mail de redefinição",
+  "backToSignIn": "Voltar ao início de sessão"
+},
+"welcomeOrWelcomeBackPage": {
+  "welcomeBack": "Bem-vindo de volta",
+  "yourEmail": "O seu e-mail",
+  "emailPlaceholder": "nome@empresa.com",
+  "password": "Palavra-passe",
+  "passwordPlaceholder": "Introduza a sua palavra-passe",
+  "forgotPassword": "Esqueceu-se da palavra-passe?",
+  "signIn": "Iniciar sessão"
+},
+"Home": "Início",
+"About_Us": "Sobre Nós",
+"Our_Studies": "Nossos Estudos",
+"Terms_of_Service": "Termos de Serviço",
+"Cookies_Policy": "Política de Cookies",
+"Privacy_Policy": "Política de Privacidade"
+    ,
   "identity_provider": "Fornecedor de identidade",
   "trial_days_left": "Restam $t(day, {\"count\": {{days}} }) da sua avaliação da versão PRO",
   "day_one": "{{count}} dia",

@@ -1,4 +1,27 @@
 {
+  
+"welcomeBack": "Willkommen zurück",
+"forgotPassword": "Passwort vergessen",
+"forgetPasswordPage": {
+  "title": "Passwort vergessen",
+  "emailAddress": "E-Mail-Adresse: name@firma.com",
+  "sendResetEmail": "E-Mail zum Zurücksetzen senden",
+  "backToSignIn": "Zurück zur Anmeldung"
+},
+"welcomeOrWelcomeBackPage": {
+  "welcomeBack": "Willkommen zurück",
+  "yourEmail": "Ihre E-Mail",
+  "emailPlaceholder": "name@firma.com",
+  "password": "Passwort",
+  "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
+  "forgotPassword": "Passwort vergessen?",
+  "signIn": "Anmelden"
+},    "Home": "Startseite",
+"About_Us": "Über Uns",
+"Our_Studies": "Unsere Studien",
+"Terms_of_Service": "Nutzungsbedingungen",
+"Cookies_Policy": "Cookie-Richtlinie",
+"Privacy_Policy": "Datenschutzrichtlinie",
   "identity_provider": "Identitätsanbieter",
   "trial_days_left": "Sie haben noch $t(Tage, {\"count\": {{days}} }) im Testzeitraum der PRO-Version",
   "day_one": "{{count}} Tag",

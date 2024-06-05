@@ -1,4 +1,28 @@
 {
+  "Home": "Home",
+"About_Us": "Over Ons",
+"Our_Studies": "Onze Studies",
+"Terms_of_Service": "Servicevoorwaarden",
+"Cookies_Policy": "Cookiebeleid",
+"Privacy_Policy": "Privacybeleid",
+"welcomeBack": "Welkom terug",
+"forgotPassword": "Wachtwoord vergeten",
+"forgetPasswordPage": {
+  "title": "Wachtwoord vergeten",
+  "emailAddress": "E-mailadres: naam@bedrijf.com",
+  "sendResetEmail": "Stuur reset e-mail",
+  "backToSignIn": "Terug naar inloggen"
+},
+"welcomeOrWelcomeBackPage": {
+  "welcomeBack": "Welkom terug",
+  "yourEmail": "Uw e-mail",
+  "emailPlaceholder": "naam@bedrijf.com",
+  "password": "Wachtwoord",
+  "passwordPlaceholder": "Voer uw wachtwoord in",
+  "forgotPassword": "Wachtwoord vergeten?",
+  "signIn": "Inloggen"
+}
+    ,
   "identity_provider": "Identiteitsprovider",
   "trial_days_left": "U heeft nog $t(day, {\"count\": {{days}} }) over van uw PRO-proefperiode",
   "day_one": "{{count}} dag",

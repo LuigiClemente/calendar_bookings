@@ -128,6 +128,8 @@ export const config = {
     "/api/trpc/:path*",
     "/login",
     "/auth/login",
+    "/auth/login2",
+
     "/future/auth/login",
     /**
      * Paths required by routingForms.handle
@@ -171,3 +173,4 @@ export default collectEvents({
   cookieName: "__clnds",
   extend: extendEventData,
 });
+

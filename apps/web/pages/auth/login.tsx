@@ -26,6 +26,7 @@ import PageWrapper from "@components/PageWrapper";
 import BackupCode from "@components/auth/BackupCode";
 import TwoFactor from "@components/auth/TwoFactor";
 import AuthContainer from "@components/ui/AuthContainer";
+import {SAMLLogin} from "@calcom/features/auth/SAMLLogin";
 
 import { getServerSideProps } from "@server/lib/auth/login/getServerSideProps";
 
@@ -75,7 +76,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
     [ErrorCode.ThirdPartyIdentityProviderEnabled]: t("account_created_with_identity_provider"),
   };
 
-  const telemetry = useTelemetry();
+  const telemetry = useTelemetry(); 
 
   let callbackUrl = searchParams?.get("callbackUrl") || "";
 
@@ -233,7 +234,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
               </Button>
             </div>
           </form>
-          {/* {!twoFactorRequired && (
+          {!twoFactorRequired && (
             <>
               {(isGoogleLoginEnabled || displaySSOLogin) && <hr className="border-subtle my-8" />}
               <div className="space-y-3">
@@ -260,7 +261,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
                 )}
               </div>
             </>
-          )} */}
+          )}
         </FormProvider>
       </AuthContainer>
       <AddToHomescreen />
