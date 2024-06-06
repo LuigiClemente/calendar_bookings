@@ -22,8 +22,6 @@ export const verifyCodeHandler = async ({ ctx, input }: VerifyCodeOptions) => {
 
   if (!user || !email || !code) throw new TRPCError({ code: "BAD_REQUEST" });
 
-
-
   if (user.role === "ADMIN") {
     logger.warn(`Skipping code verification for instance admin`);
     return true;

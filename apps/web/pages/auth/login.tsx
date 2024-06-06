@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { SAMLLogin } from "@calcom/features/auth/SAMLLogin";
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import { HOSTED_CAL_FEATURES, WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
 import { getSafeRedirectUrl } from "@calcom/lib/getSafeRedirectUrl";
@@ -41,7 +42,7 @@ const GoogleIcon = () => (
   <img className="text-subtle mr-2 h-4 w-4 dark:invert" src="/google-icon.svg" alt="" />
 );
 export default function Login({
-  csrfToken,
+  csrfToken = null,
   isGoogleLoginEnabled,
   isSAMLLoginEnabled,
   samlTenantID,
@@ -233,7 +234,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
               </Button>
             </div>
           </form>
-          {/* {!twoFactorRequired && (
+          {!twoFactorRequired && (
             <>
               {(isGoogleLoginEnabled || displaySSOLogin) && <hr className="border-subtle my-8" />}
               <div className="space-y-3">
@@ -260,7 +261,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
                 )}
               </div>
             </>
-          )} */}
+          )}
         </FormProvider>
       </AuthContainer>
       <AddToHomescreen />

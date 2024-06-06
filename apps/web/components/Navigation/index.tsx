@@ -1,10 +1,14 @@
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useTransition } from "react";
 import { CiGlobe } from "react-icons/ci";
 import { Popover } from "react-tiny-popover";
+
+import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { trpc } from "@calcom/trpc/react";
+import { showToast } from "@calcom/ui";
 
 import { IMAGE_URL } from "@lib/image_url";
 import { languages } from "@lib/languages";
@@ -22,6 +26,9 @@ export const Navigation = ({
   setIsHovered,
   isLangBtnHovered,
   setIsLangBtnHovered,
+  changeLanguage,
+  languageData,
+  selectedLanguage,
 }: {
   navOpen: boolean;
   langOpen: boolean;
@@ -31,30 +38,15 @@ export const Navigation = ({
   setIsHovered: any;
   setIsLangBtnHovered: any;
   isLangBtnHovered: any;
+  changeLanguage: any;
+  languageData: any;
+  selectedLanguage: any;
 }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const selectedLanguage = "en";
+  const pathname = usePathname();
+  const { t, i18n } = useLocale();
   const [langBtnState, setLangBtnState] = useState(false);
-
-  const t = (text: string) => text; // Temporary translation function
-  const languageRoutes: any = {
-    en: "/home",
-    de: "/startseite",
-    nl: "/startpagina",
-    fr: "/accueil",
-    es: "/inicio",
-    pt: "/pagina-inicial",
-    it: "/casa",
-  };
-
-  const changeLanguage = (langCode: LocalActiveType) => {
-    const route = languageRoutes[langCode];
-    if (route) {
-      document.cookie = `NEXT_LOCALE=${langCode}; path=/; max-age=31536000; samesite=lax`;
-      router.push(route);
-    }
-  };
 
   return (
     <nav className="dark mx-auto flex w-full items-center justify-between pr-[10px]">
