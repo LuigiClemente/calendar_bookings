@@ -271,7 +271,7 @@ providers.push(
           expires_in: number;
           refresh_expires_in: number;
         }>(
-          `http://49.13.193.45:8080/realms/master/protocol/openid-connect/token`,
+          `http://49.13.193.45:9080/realms/master/protocol/openid-connect/token`,
           qs.stringify({
             grant_type: "password",
             client_id: "documenso",
@@ -297,7 +297,7 @@ providers.push(
             given_name: string;
             family_name: string;
             email: string;
-          }>(`http://49.13.193.45:8080/realms/master/protocol/openid-connect/userinfo`, {
+          }>(`http://49.13.193.45:9080/realms/master/protocol/openid-connect/userinfo`, {
             headers: {
               Authorization: `Bearer ${access_token}`,
             },
@@ -318,6 +318,7 @@ providers.push(
                 email: userEmail,
                 name: `${given_name} ${family_name}`,
                 username: userEmail,
+                emailVerified: new Date(),
                 identityProvider: IdentityProvider.CAL,
                 identityProviderId: sub,
                 password: {
@@ -330,16 +331,18 @@ providers.push(
 
             console.log("User Created", user);
 
-            const profile = await prisma.profile.create({
+            const membership = await prisma.membership.create({
               data: {
                 userId: user.id,
-                uid: sub,
-                username: userEmail,
-                name: `${given_name} ${family_name}`,
+                teamId: 1,
+                role: MembershipRole.MEMBER,
+                accepted: true,
               },
             });
 
-            console.log("Profile Created", profile);
+            user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
+
+            console.log("Membership Created", membership);
           }
 
           const hasActiveTeams = checkIfUserBelongsToActiveTeam(user);
