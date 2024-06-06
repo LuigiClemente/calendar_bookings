@@ -1,18 +1,19 @@
+import fs from "fs";
 import { jwtVerify } from "jose";
 import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken } from "next-auth/react";
+import path from "path";
 
-import fs from 'fs';
-import path from 'path';
 import { getServerSession } from "@calcom/features/auth/lib/getServerSession";
 import { isSAMLLoginEnabled, samlProductID, samlTenantID } from "@calcom/features/ee/sso/lib/saml";
 import { WEBSITE_URL } from "@calcom/lib/constants";
 import { getSafeRedirectUrl } from "@calcom/lib/getSafeRedirectUrl";
 import prisma from "@calcom/prisma";
 
+import { locales } from "@lib/languages";
+
 import { IS_GOOGLE_LOGIN_ENABLED } from "@server/lib/constants";
 import { ssrInit } from "@server/lib/ssr";
-import { locales } from "@lib/languages";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { req, res, query } = context;
@@ -92,28 +93,29 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-const obj : any= {};
-  const updatedArray = locales.map((locale)=>{
-  obj[locale] = loadTranslations(locale);
+  const obj: any = {};
+  const updatedArray = locales.map((locale) => {
+    obj[locale] = loadTranslations(locale);
   });
-  console.log({updatedArray})
+  console.log({ updatedArray });
+  const csrfToken = (await getCsrfToken(context)) || null;
+  console.log(`CSRF Token: ${csrfToken}`);
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
+      csrfToken,
       trpcState: ssr.dehydrate(),
       isGoogleLoginEnabled: IS_GOOGLE_LOGIN_ENABLED,
       isSAMLLoginEnabled,
       samlTenantID,
       samlProductID,
       totpEmail,
-      languagesData : obj
+      languagesData: obj,
     },
   };
-} 
+}
 
-
-const loadTranslations = (locale:string) => {
-  const filePath = path.join(process.cwd(), 'public', 'static', 'locales', locale, 'common.json');
-  const fileContents = fs.readFileSync(filePath, 'utf-8');
+const loadTranslations = (locale: string) => {
+  const filePath = path.join(process.cwd(), "public", "static", "locales", locale, "common.json");
+  const fileContents = fs.readFileSync(filePath, "utf-8");
   return JSON.parse(fileContents);
 };

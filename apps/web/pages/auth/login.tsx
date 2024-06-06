@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { SAMLLogin } from "@calcom/features/auth/SAMLLogin";
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import { HOSTED_CAL_FEATURES, WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
 import { getSafeRedirectUrl } from "@calcom/lib/getSafeRedirectUrl";
@@ -26,7 +27,6 @@ import PageWrapper from "@components/PageWrapper";
 import BackupCode from "@components/auth/BackupCode";
 import TwoFactor from "@components/auth/TwoFactor";
 import AuthContainer from "@components/ui/AuthContainer";
-import {SAMLLogin} from "@calcom/features/auth/SAMLLogin";
 
 import { getServerSideProps } from "@server/lib/auth/login/getServerSideProps";
 
@@ -42,7 +42,7 @@ const GoogleIcon = () => (
   <img className="text-subtle mr-2 h-4 w-4 dark:invert" src="/google-icon.svg" alt="" />
 );
 export default function Login({
-  csrfToken,
+  csrfToken = null,
   isGoogleLoginEnabled,
   isSAMLLoginEnabled,
   samlTenantID,
@@ -76,7 +76,7 @@ inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) {
     [ErrorCode.ThirdPartyIdentityProviderEnabled]: t("account_created_with_identity_provider"),
   };
 
-  const telemetry = useTelemetry(); 
+  const telemetry = useTelemetry();
 
   let callbackUrl = searchParams?.get("callbackUrl") || "";
 

@@ -1,11 +1,13 @@
 import type { Membership, Team, UserPermissionRole } from "@prisma/client";
-import type { AuthOptions, Session } from "next-auth";
+import axios from "axios";
+import type { AuthOptions, Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { encode } from "next-auth/jwt";
 import type { Provider } from "next-auth/providers";
 import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
+import qs from "qs";
 
 import checkLicense from "@calcom/features/ee/common/server/checkLicense";
 import createUsersAndConnectToOrg from "@calcom/features/ee/dsync/lib/users/createUsersAndConnectToOrg";
@@ -213,10 +215,10 @@ const providers: Provider[] = [
         // User's identity provider is not "CAL"
         if (user.identityProvider !== IdentityProvider.CAL) return role;
 
-        if (process.env.NEXT_PUBLIC_IS_E2E) {
-          console.warn("E2E testing is enabled, skipping password and 2FA requirements for Admin");
-          return role;
-        }
+        // if (process.env.NEXT_PUBLIC_IS_E2E) {
+        //   console.warn("E2E testing is enabled, skipping password and 2FA requirements for Admin");
+        //   return role;
+        // }
 
         // User's password is valid and two-factor authentication is enabled
         if (isPasswordValid(credentials.password, false, true) && user.twoFactorEnabled) return role;
@@ -242,14 +244,16 @@ const providers: Provider[] = [
 ];
 
 providers.push(
-  {
+  CredentialsProvider({
     id: "keycloak",
     name: "Keycloak Login",
     credentials: {
       email: { label: "Email", type: "text" },
       password: { label: "Password", type: "password" },
     },
-    async authorize(credentials) {
+
+    async authorize(credentials): Promise<User | null | undefined> {
+      console.log("credentials", credentials);
       if (!credentials) {
         return null;
       }
@@ -260,77 +264,126 @@ providers.push(
         return null;
       }
 
-      // Fetch access token from Keycloak
       try {
-        const response = await axios.post(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/token`,
+        const response = await axios.post<{
+          access_token: string;
+          refresh_token: string;
+          expires_in: number;
+          refresh_expires_in: number;
+        }>(
+          `http://49.13.193.45:8080/realms/master/protocol/openid-connect/token`,
           qs.stringify({
-            grant_type: 'password',
-            client_id: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_ID,
-            client_secret: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_SECRET,
+            grant_type: "password",
+            client_id: "documenso",
+            client_secret: "xCzTJZxNeOGEuDFbzp2e4JEnKo3fxJaC",
             username: email,
             password: password,
-            scope: 'openid',
-          }), {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        });
-
-        const data = response.data;
-
-        if (data.access_token) {
-          const userInfoResponse = await axios.get(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/userinfo`, {
+            scope: "openid",
+          }),
+          {
             headers: {
-              Authorization: `Bearer ${data.access_token}`,
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }
+        );
+
+        console.log(response.data);
+
+        const { access_token } = response.data;
+
+        if (access_token) {
+          const userInfoResponse = await axios.get<{
+            sub: string;
+            given_name: string;
+            family_name: string;
+            email: string;
+          }>(`http://49.13.193.45:8080/realms/master/protocol/openid-connect/userinfo`, {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
             },
           });
 
-          const userInfo = userInfoResponse.data;
+          console.log(userInfoResponse.data);
 
-          if (!userInfo) {
-            return null;
-          }
+          const { sub, given_name, family_name, email: userEmail } = userInfoResponse.data;
 
-          const { sub, given_name, family_name, email: userEmail } = userInfo;
           let user = !userEmail
             ? undefined
             : await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
 
+          console.log(user);
           if (!user) {
-            const hostedCal = Boolean(HOSTED_CAL_FEATURES);
-            if (hostedCal && userEmail) {
-              const domain = getDomainFromEmail(userEmail);
-              const organizationId = await getVerifiedOrganizationByAutoAcceptEmailDomain(domain);
-              if (organizationId) {
-                const createUsersAndConnectToOrgProps = {
-                  emailsToCreate: [userEmail],
-                  organizationId,
-                  identityProvider: IdentityProvider.OIDC,
-                  identityProviderId: userEmail,
-                };
-                await createUsersAndConnectToOrg(createUsersAndConnectToOrgProps);
-                user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({
-                  email: userEmail,
-                });
-              }
-            }
-            if (!user) throw new Error(ErrorCode.UserNotFound);
+            user = await prisma.user.create({
+              data: {
+                email: userEmail,
+                name: `${given_name} ${family_name}`,
+                username: userEmail,
+                identityProvider: IdentityProvider.CAL,
+                identityProviderId: sub,
+                password: {
+                  create: {
+                    hash: password,
+                  },
+                },
+              },
+            });
+
+            console.log("User Created", user);
+
+            const profile = await prisma.profile.create({
+              data: {
+                userId: user.id,
+                uid: sub,
+                username: userEmail,
+                name: `${given_name} ${family_name}`,
+              },
+            });
+
+            console.log("Profile Created", profile);
           }
 
-          const [userProfile] = user?.allProfiles;
-          return {
-            id: sub,
-            firstName: given_name,
-            lastName: family_name,
-            email: userEmail,
-            name: `${given_name} ${family_name}`.trim(),
-            email_verified: true,
-            profile: userProfile,
+          const hasActiveTeams = checkIfUserBelongsToActiveTeam(user);
+
+          const validateRole = (role: UserPermissionRole) => {
+            // User's role is not "ADMIN"
+            if (role !== "ADMIN") return role;
+            // User's identity provider is not "CAL"
+            if (user.identityProvider !== IdentityProvider.CAL) return role;
+
+            // if (process.env.NEXT_PUBLIC_IS_E2E) {
+            //   console.warn("E2E testing is enabled, skipping password and 2FA requirements for Admin");
+            //   return role;
+            // }
+
+            // User's password is valid and two-factor authentication is enabled
+            if (isPasswordValid(credentials.password, false, true) && user.twoFactorEnabled) return role;
+            // Code is running in a development environment
+            if (isENVDev) return role;
+            // By this point it is an ADMIN without valid security conditions
+            return "INACTIVE_ADMIN";
           };
-        },
-        type: "credentials"
+
+          const [userProfile] = user?.allProfiles;
+
+          console.log("return user", user);
+          return {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            name: user.name,
+            role: validateRole(user.role),
+            belongsToActiveTeam: hasActiveTeams,
+            locale: user.locale,
+            profile: user.allProfiles[0],
+          };
+        }
+      } catch (error) {
+        console.error("Keycloak authentication error:", error);
+        return null;
       }
-)
+    },
+  })
+);
 
 if (IS_GOOGLE_LOGIN_ENABLED) {
   providers.push(
@@ -612,12 +665,12 @@ export const AUTH_OPTIONS: AuthOptions = {
           // So, we just set the currently switched organization only here.
           org: profileOrg
             ? {
-              id: profileOrg.id,
-              name: profileOrg.name,
-              slug: profileOrg.slug ?? profileOrg.requestedSlug ?? "",
-              fullDomain: getOrgFullOrigin(profileOrg.slug ?? profileOrg.requestedSlug ?? ""),
-              domainSuffix: subdomainSuffix(),
-            }
+                id: profileOrg.id,
+                name: profileOrg.name,
+                slug: profileOrg.slug ?? profileOrg.requestedSlug ?? "",
+                fullDomain: getOrgFullOrigin(profileOrg.slug ?? profileOrg.requestedSlug ?? ""),
+                domainSuffix: subdomainSuffix(),
+              }
             : null,
         } as JWT;
       };
