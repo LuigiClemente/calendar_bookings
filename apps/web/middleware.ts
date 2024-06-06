@@ -173,4 +173,3 @@ export default collectEvents({
   cookieName: "__clnds",
   extend: extendEventData,
 });
-

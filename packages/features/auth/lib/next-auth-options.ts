@@ -5,6 +5,7 @@ import type { JWT } from "next-auth/jwt";
 import { encode } from "next-auth/jwt";
 import type { Provider } from "next-auth/providers";
 import CredentialsProvider from "next-auth/providers/credentials";
+import KeycloakProvider from "next-auth/providers/keycloak";
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import qs from "qs";
@@ -252,7 +253,9 @@ providers.push(
       password: { label: "Password", type: "password" },
     },
 
-    async authorize(credentials): Promise<User | null | undefined> {
+    async authorize(
+      credentials: Record<string, string> | undefined
+    ): Promise<User | null> {
       console.log("credentials", credentials);
       if (!credentials) {
         return null;
@@ -307,86 +310,55 @@ providers.push(
 
           const { sub, given_name, family_name, email: userEmail } = userInfoResponse.data;
 
-          let user = !userEmail
-            ? undefined
-            : await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
+          let user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
 
-          console.log(user);
           if (!user) {
-            user = await prisma.user.create({
+            const tempUser = await prisma.user.create({
               data: {
                 email: userEmail,
                 name: `${given_name} ${family_name}`,
-                username: userEmail,
+                username: usernameSlug(`${given_name} ${family_name}`),
                 emailVerified: new Date(),
-                identityProvider: IdentityProvider.CAL,
+                identityProvider: IdentityProvider.KEYCLOAK,
                 identityProviderId: sub,
-                password: {
-                  create: {
-                    hash: password,
-                  },
-                },
               },
             });
 
-            console.log("User Created", user);
+            console.log("User Created", tempUser);
 
-            const membership = await prisma.membership.create({
-              data: {
-                userId: user.id,
-                teamId: 1,
-                role: MembershipRole.MEMBER,
-                accepted: true,
-              },
-            });
+            if (!tempUser) {
+              throw new Error(ErrorCode.UserNotFound);
+            }
 
             user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
 
-            console.log("Membership Created", membership);
+            if (!user) {
+              throw new Error(ErrorCode.UserNotFound);
+            }
           }
 
           const hasActiveTeams = checkIfUserBelongsToActiveTeam(user);
 
-          const validateRole = (role: UserPermissionRole) => {
-            // User's role is not "ADMIN"
-            if (role !== "ADMIN") return role;
-            // User's identity provider is not "CAL"
-            if (user.identityProvider !== IdentityProvider.CAL) return role;
+          // Remove the validateRole function as it's not needed for Keycloak authentication
 
-            // if (process.env.NEXT_PUBLIC_IS_E2E) {
-            //   console.warn("E2E testing is enabled, skipping password and 2FA requirements for Admin");
-            //   return role;
-            // }
-
-            // User's password is valid and two-factor authentication is enabled
-            if (isPasswordValid(credentials.password, false, true) && user.twoFactorEnabled) return role;
-            // Code is running in a development environment
-            if (isENVDev) return role;
-            // By this point it is an ADMIN without valid security conditions
-            return "INACTIVE_ADMIN";
-          };
-
-          const [userProfile] = user?.allProfiles;
-
-          console.log("return user", user);
           return {
             id: user.id,
             username: user.username,
             email: user.email,
             name: user.name,
-            role: validateRole(user.role),
+            role: user.role,
             belongsToActiveTeam: hasActiveTeams,
             locale: user.locale,
             profile: user.allProfiles[0],
-          };
+          } as User;
         }
       } catch (error) {
         console.error("Keycloak authentication error:", error);
         return null;
       }
+      return null
     },
-  })
-);
+  }));
 
 if (IS_GOOGLE_LOGIN_ENABLED) {
   providers.push(
@@ -668,12 +640,12 @@ export const AUTH_OPTIONS: AuthOptions = {
           // So, we just set the currently switched organization only here.
           org: profileOrg
             ? {
-                id: profileOrg.id,
-                name: profileOrg.name,
-                slug: profileOrg.slug ?? profileOrg.requestedSlug ?? "",
-                fullDomain: getOrgFullOrigin(profileOrg.slug ?? profileOrg.requestedSlug ?? ""),
-                domainSuffix: subdomainSuffix(),
-              }
+              id: profileOrg.id,
+              name: profileOrg.name,
+              slug: profileOrg.slug ?? profileOrg.requestedSlug ?? "",
+              fullDomain: getOrgFullOrigin(profileOrg.slug ?? profileOrg.requestedSlug ?? ""),
+              domainSuffix: subdomainSuffix(),
+            }
             : null,
         } as JWT;
       };

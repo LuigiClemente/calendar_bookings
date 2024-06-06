@@ -1,19 +1,21 @@
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter  , usePathname} from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useTransition } from "react";
 import { CiGlobe } from "react-icons/ci";
 import { Popover } from "react-tiny-popover";
+
+import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc/react";
+import { showToast } from "@calcom/ui";
 
 import { IMAGE_URL } from "@lib/image_url";
 import { languages } from "@lib/languages";
 import type { LocalActiveType } from "@lib/routes";
 import { routes } from "@lib/routes";
-import {showToast} from "@calcom/ui"
+
 import "./navigation.css";
-import { useLocale } from "@calcom/lib/hooks/useLocale";
 
 export const Navigation = ({
   navOpen,
@@ -25,8 +27,8 @@ export const Navigation = ({
   isLangBtnHovered,
   setIsLangBtnHovered,
   changeLanguage,
-          languageData,
-          selectedLanguage
+  languageData,
+  selectedLanguage,
 }: {
   navOpen: boolean;
   langOpen: boolean;
@@ -36,18 +38,16 @@ export const Navigation = ({
   setIsHovered: any;
   setIsLangBtnHovered: any;
   isLangBtnHovered: any;
-  changeLanguage:any;
-  languageData:any;
-  selectedLanguage : any;
+  changeLanguage: any;
+  languageData: any;
+  selectedLanguage: any;
 }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
-  const {t , i18n} = useLocale();
+  const { t, i18n } = useLocale();
   const [langBtnState, setLangBtnState] = useState(false);
 
-
-  
   return (
     <nav className="dark mx-auto flex w-full items-center justify-between pr-[10px]">
       <div className="relative font-extrabold text-black">

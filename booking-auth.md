@@ -12,7 +12,7 @@
    - Saleor triggers a webhook to Zammad that notifies of the payment without including session tokens or URLs.
    - Zammad, upon receiving the webhook, creates a token for the session and triggers a webhook to request APISIX to create a dynamic URL.
    - APISIX returns the dynamic URL to Zammad linked to this URL.
-  
+
 function webhook(conf, ctx)
 
     -- Import necessary libraries
@@ -43,18 +43,20 @@ function webhook(conf, ctx)
 
     -- Return the response from the upstream service
     return conf.status, conf.body
+
 end
 
 2. **Token and URL Management**:
+
    - Zammad manages the lifecycle of the booking URL and token, ensuring that changes such as rescheduling are possible up to 24 hours before the session. Zammad handles the logic through its tickets capabilities, as each session initiates a ticket.
-   -  
+   -
 
 3. **APISIX External Authentication Plugin**:
+
    - Utilizes an external authentication plugin to validate sessions and tokens communicated by Zammad, providing secure access to the booking URL.
 
 4. **Dynamic URL Access**:
    - When a client attempts to access the booking URL, APISIX checks for authentication. If unauthenticated, the client is prompted to log in.
-
 
 ```mermaid
 

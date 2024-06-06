@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
 import { WEBAPP_URL } from "@calcom/lib/constants";
@@ -17,7 +17,17 @@ import { Alert, Button, EmailField, PasswordField } from "@calcom/ui";
 import PageWrapper from "@components/PageWrapper";
 import AuthContainer from "@components/ui/AuthContainer";
 
-export default function Login({ csrfToken = null }) {
+type LoginFormValues = {
+  email: string;
+  password: string;
+  csrfToken?: string;
+};
+
+type LoginProps = {
+  csrfToken?: string | null;
+};
+
+export default function Login({ csrfToken = null }: LoginProps) {
   const searchParams = useCompatSearchParams();
   const { t } = useLocale();
   const router = useRouter();
@@ -25,9 +35,9 @@ export default function Login({ csrfToken = null }) {
     email: z.string().min(1, t("error_required_field")).email(t("enter_valid_email")),
     password: z.string().min(1, t("error_required_field")),
   });
-  const methods = useForm({ resolver: zodResolver(formSchema) });
+  const methods = useForm<LoginFormValues>({ resolver: zodResolver(formSchema) });
   const { register, formState } = methods;
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const telemetry = useTelemetry();
 
@@ -44,7 +54,7 @@ export default function Login({ csrfToken = null }) {
 
   callbackUrl = safeCallbackUrl || "";
 
-  const onSubmit = async (values) => {
+  const onSubmit: SubmitHandler<LoginFormValues> = async (values) => {
     setErrorMessage(null);
     telemetry.event(telemetryEventTypes.login, collectPageParameters());
     const res = await signIn("keycloak", {
@@ -71,7 +81,7 @@ export default function Login({ csrfToken = null }) {
               <EmailField
                 id="email"
                 label={t("email_address")}
-                defaultValue={searchParams?.get("email")}
+                defaultValue={searchParams?.get("email") as string}
                 placeholder="john.doe@example.com"
                 required
                 {...register("email")}
