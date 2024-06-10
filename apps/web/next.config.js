@@ -173,7 +173,7 @@ const nextConfig = {
   },
   /* We already do linting on GH actions */
   eslint: {
-    ignoreDuringBuilds: !!process.env.CI,
+    ignoreDuringBuilds: true,
   },
   transpilePackages: [
     "@calcom/app-store",

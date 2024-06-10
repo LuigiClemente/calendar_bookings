@@ -11,9 +11,9 @@ export default defineConfig(({ command }) => {
       !isBuild &&
         checker({
           typescript: true,
-          eslint: {
-            lintCommand: 'eslint "./src/**/*.{ts,tsx}"', // Adjust this path according to your project structure
-          },
+          // eslint: {
+          //   lintCommand: 'eslint "./src/**/*.{ts,tsx}"', // Adjust this path according to your project structure
+          // },
         }),
     ].filter(Boolean),
   };

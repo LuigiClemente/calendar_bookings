@@ -39,7 +39,7 @@ export function Logout(props: Props) {
 
   const navigateToLogin = () => {
     setBtnLoading(true);
-    router.push("/auth/login");
+    router.push("/auth/login-new");
   };
 
   return (

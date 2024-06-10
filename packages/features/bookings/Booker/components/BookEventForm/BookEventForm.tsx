@@ -1,7 +1,7 @@
 import type { TFunction } from "next-i18next";
 import { Trans } from "next-i18next";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { FieldError } from "react-hook-form";
 
 import { IS_CALCOM, WEBSITE_URL } from "@calcom/lib/constants";
@@ -15,6 +15,7 @@ import type { UseBookingFormReturnType } from "../hooks/useBookingForm";
 import type { IUseBookingErrors, IUseBookingLoadingStates } from "../hooks/useBookings";
 import { BookingFields } from "./BookingFields";
 import { FormSkeleton } from "./Skeleton";
+import type { Session } from "next-auth";
 
 type BookEventFormProps = {
   onCancel?: () => void;
@@ -27,6 +28,7 @@ type BookEventFormProps = {
   renderConfirmNotVerifyEmailButtonCond: boolean;
   extraOptions: Record<string, string | string[]>;
   isPlatform?: boolean;
+  session: Session | null;
 };
 
 export const BookEventForm = ({
@@ -42,10 +44,12 @@ export const BookEventForm = ({
   children,
   extraOptions,
   isPlatform = false,
+  session,
 }: Omit<BookEventFormProps, "event"> & {
   eventQuery: useEventReturnType;
   rescheduleUid: string | null;
 }) => {
+
   const eventType = eventQuery.data;
   const setFormValues = useBookerStore((state) => state.setFormValues);
   const bookingData = useBookerStore((state) => state.bookingData);
@@ -80,6 +84,15 @@ export const BookEventForm = ({
     return <Alert severity="warning" message={t("error_booking_event")} />;
   }
 
+  useEffect(() => {
+    if (!session) return;
+    let values = bookingForm.getValues();
+    values = {
+      ...values, responses: { ...values.responses, email: session?.user?.email, name: session?.user?.name }
+    }
+    setFormValues(values);
+  }, [session]);
+
   return (
     <div className="flex h-full flex-col">
       <Form
@@ -95,6 +108,7 @@ export const BookEventForm = ({
         handleSubmit={onSubmit}
         noValidate>
         <BookingFields
+          session={session}
           isDynamicGroupBooking={!!(username && username.indexOf("+") > -1)}
           fields={eventType.bookingFields}
           locations={eventType.locations}
@@ -149,10 +163,10 @@ export const BookEventForm = ({
                 {rescheduleUid && bookingData
                   ? t("reschedule")
                   : renderConfirmNotVerifyEmailButtonCond
-                  ? isPaidEvent
-                    ? t("pay_and_book")
-                    : t("confirm")
-                  : t("verify_email_email_button")}
+                    ? isPaidEvent
+                      ? t("pay_and_book")
+                      : t("confirm")
+                    : t("verify_email_email_button")}
               </Button>
             </>
           )}
