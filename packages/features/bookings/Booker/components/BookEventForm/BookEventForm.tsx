@@ -1,7 +1,7 @@
 import type { TFunction } from "next-i18next";
 import { Trans } from "next-i18next";
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import type { FieldError } from "react-hook-form";
 
 import { IS_CALCOM, WEBSITE_URL } from "@calcom/lib/constants";
@@ -28,7 +28,7 @@ type BookEventFormProps = {
   renderConfirmNotVerifyEmailButtonCond: boolean;
   extraOptions: Record<string, string | string[]>;
   isPlatform?: boolean;
-  session: Session | null;
+  session: Session;
 };
 
 export const BookEventForm = ({
@@ -66,6 +66,17 @@ export const BookEventForm = ({
     return eventType?.price > 0 && !Number.isNaN(paymentAppData.price) && paymentAppData.price > 0;
   }, [eventType]);
 
+  useEffect(() => {
+    if (session && session.user) {
+      bookingForm.setValue("responses.email", session.user.email || "");
+      bookingForm.setValue("responses.name", session.user.name || "");
+    } else {
+      // Clear the form values if session is not available
+      bookingForm.setValue("responses.email", "");
+      bookingForm.setValue("responses.name", "");
+    }
+  }, [session, bookingForm]);
+
   if (eventQuery.isError) return <Alert severity="warning" message={t("error_booking_event")} />;
   if (eventQuery.isPending || !eventQuery.data) return <FormSkeleton />;
   if (!timeslot)
@@ -84,14 +95,7 @@ export const BookEventForm = ({
     return <Alert severity="warning" message={t("error_booking_event")} />;
   }
 
-  useEffect(() => {
-    if (!session) return;
-    let values = bookingForm.getValues();
-    values = {
-      ...values, responses: { ...values.responses, email: session?.user?.email, name: session?.user?.name }
-    }
-    setFormValues(values);
-  }, [session]);
+
 
   return (
     <div className="flex h-full flex-col">
@@ -108,7 +112,6 @@ export const BookEventForm = ({
         handleSubmit={onSubmit}
         noValidate>
         <BookingFields
-          session={session}
           isDynamicGroupBooking={!!(username && username.indexOf("+") > -1)}
           fields={eventType.bookingFields}
           locations={eventType.locations}

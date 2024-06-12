@@ -1156,6 +1156,17 @@ async function handler(
       rescheduleUid,
       !!eventType.seatsPerTimeSlot
     );
+
+    if (originalRescheduledBooking) {
+      const bookingCreatedAt = dayjs(originalRescheduledBooking.createdAt);
+      const now = dayjs();
+    
+      if (now.diff(bookingCreatedAt, 'hour') > 24) {
+        throw new HttpError({ statusCode: 400, message: "Cannot reschedule a booking that is more than 24 hours old" });
+      }
+    }
+
+
     if (!originalRescheduledBooking) {
       throw new HttpError({ statusCode: 404, message: "Could not find original booking" });
     }

@@ -19,29 +19,19 @@ export const BookingFields = ({
   rescheduleUid,
   isDynamicGroupBooking,
   bookingData,
-  session,
 }: {
   fields: NonNullable<RouterOutputs["viewer"]["public"]["event"]>["bookingFields"];
   locations: LocationObject[];
   rescheduleUid?: string;
   bookingData?: GetBookingType | null;
   isDynamicGroupBooking: boolean;
-  session: Session | null;
 }) => {
 
-  console.log("session", session)
   const { t } = useLocale();
   const { watch, setValue } = useFormContext();
   const locationResponse = watch("responses.location");
   const currentView = rescheduleUid ? "reschedule" : "";
   const isInstantMeeting = useBookerStore((state) => state.isInstantMeeting);
-
-  console.log("fields", fields)
-
-  // if (session) {
-  //   setValue("responses.email", session.user.email);
-  //   setValue("responses.name", session.user.name);
-  // }
 
   return (
     // TODO: It might make sense to extract this logic into BookingFields config, that would allow to quickly configure system fields and their editability in fresh booking and reschedule booking view

@@ -118,6 +118,7 @@ async function getBookingToDelete(id: number | undefined, uid: string | undefine
       responses: true,
       iCalUID: true,
       iCalSequence: true,
+      createdAt: true,
     },
   });
 }
@@ -135,6 +136,9 @@ async function handler(req: CustomRequest) {
   const { id, uid, allRemainingBookings, cancellationReason, seatReferenceUid } =
     schemaBookingCancelParams.parse(req.body);
   req.bookingToDelete = await getBookingToDelete(id, uid);
+
+ 
+
   const {
     bookingToDelete,
     userId,
@@ -144,8 +148,17 @@ async function handler(req: CustomRequest) {
     platformRescheduleUrl,
   } = req;
 
+  
+
   if (!bookingToDelete || !bookingToDelete.user) {
     throw new HttpError({ statusCode: 400, message: "Booking not found" });
+  }
+
+  const bookingCreatedAt = dayjs(bookingToDelete.createdAt);
+  const now = dayjs();
+
+  if (now.diff(bookingCreatedAt, 'hour') > 24) {
+    throw new HttpError({ statusCode: 400, message: "Cannot cancel a booking that was created more than 24 hours ago" });
   }
 
   if (!bookingToDelete.userId) {

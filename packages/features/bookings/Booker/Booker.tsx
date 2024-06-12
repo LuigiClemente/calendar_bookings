@@ -71,7 +71,7 @@ const BookerComponent = ({
   orgBannerUrl,
   customClassNames,
   session,
-}: BookerProps & WrappedBookerProps & { session: Session | null }) => {
+}: BookerProps & WrappedBookerProps & { session: Session }) => {
 
 
   const { t } = useLocale();
@@ -498,9 +498,11 @@ export const Booker = (props: BookerProps & WrappedBookerProps) => {
     return <p>Loading...</p>;
   }
 
-  return (
+  if (session !== null) return (
     <LazyMotion strict features={loadFramerFeatures}>
       <BookerComponent {...props} session={session} />
     </LazyMotion>
   );
+
+  return null;
 };

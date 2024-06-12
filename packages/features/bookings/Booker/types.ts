@@ -13,8 +13,6 @@ import type { BookerLayouts } from "@calcom/prisma/zod-utils";
 
 import type { GetBookingType } from "../lib/get-booking";
 
-import type { Session } from "next-auth";
-
 
 export interface BookerProps {
   eventSlug: string;
@@ -118,7 +116,6 @@ export type WrappedBookerPropsMain = {
   bookerLayout: UseBookerLayoutType;
   verifyEmail: UseVerifyEmailReturnType;
   customClassNames?: CustomClassNames;
-  session: Session | null;
 };
 
 export type WrappedBookerPropsForPlatform = WrappedBookerPropsMain & {
