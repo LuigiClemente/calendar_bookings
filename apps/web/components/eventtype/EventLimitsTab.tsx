@@ -55,6 +55,7 @@ const MinimumBookingNoticeInput = React.forwardRef<
     ),
   });
   // keep hidden field in sync with minimumBookingNoticeDisplayValues
+
   useEffect(() => {
     setValue(
       passThroughProps.name,
@@ -109,6 +110,48 @@ const MinimumBookingNoticeInput = React.forwardRef<
   );
 });
 
+const ReschedulingLimitInput = ({
+  hoursValue,
+  daysValue,
+  onHoursChange,
+  onDaysChange,
+  disabled,
+  hoursLabel,
+  daysLabel,
+}) => {
+  return (
+    <div className="flex items-center space-x-4">
+      <div className="flex items-center">
+        <InputField
+          required
+          disabled={disabled}
+          value={hoursValue}
+          onChange={(e) => onHoursChange(Math.min(parseInt(e.target.value || "0", 10), 24))}
+          type="number"
+          placeholder="0"
+          min={0}
+          max={24}
+          className="mb-0 mr-2 h-9 w-20 rounded-[4px]"
+        />
+        <span>{hoursLabel}</span>
+      </div>
+      <div className="flex items-center">
+        <InputField
+          required
+          disabled={disabled}
+          value={daysValue}
+          onChange={(e) => onDaysChange(parseInt(e.target.value || "0", 10))}
+          type="number"
+          placeholder="0"
+          min={0}
+          className="mb-0 mr-2 h-9 w-20 rounded-[4px]"
+        />
+        <span>{daysLabel}</span>
+      </div>
+    </div>
+  );
+};
+
 export const EventLimitsTab = ({ eventType }: Pick<EventTypeSetupProps, "eventType">) => {
   const { t, i18n } = useLocale();
   const formMethods = useFormContext<FormValues>();
@@ -147,6 +190,17 @@ export const EventLimitsTab = ({ eventType }: Pick<EventTypeSetupProps, "eventTy
     { value: 1, label: t("calendar_days") },
   ];
 
+  const allowRescheduling = t("allow_rescheduling");
+  const allowReschedulingDescription = t("allow_rescheduling_description");
+  const maxReschedulingHours = t("max_rescheduling_hours");
+  const maxReschedulingDays = t("max_rescheduling_days");
+  const noReschedulingLimit = t("no_rescheduling_limit");
+  const allowCancellation = t("allow_cancellation");
+  const allowCancellationDescription = t("allow_cancellation_description");
+  const maxCancellationHours = t("max_cancellation_hours");
+  const maxCancellationDays = t("max_cancellation_days");
+  const noCancellationLimit = t("no_cancellation_limit");
+
   const [offsetToggle, setOffsetToggle] = useState(formMethods.getValues("offsetStart") > 0);
 
   // Preview how the offset will affect start times
@@ -154,6 +208,70 @@ export const EventLimitsTab = ({ eventType }: Pick<EventTypeSetupProps, "eventTy
   const offsetOriginalTime = new Date();
   offsetOriginalTime.setHours(9, 0, 0, 0);
   const offsetAdjustedTime = new Date(offsetOriginalTime.getTime() + watchOffsetStartValue * 60 * 1000);
+
+  const defaultAllowReschedulingValue = {
+    enabled: false,
+    maxHours: null,
+    maxDays: null,
+  };
+
+  const defaultAllowCancellationValue = {
+    enabled: false,
+    maxHours: null,
+    maxDays: null,
+  };
+
+  const handleReschedulingLimitChange = (field: "maxHours" | "maxDays", value: number | null) => {
+    const currentValue = formMethods.getValues("allowRescheduling");
+    formMethods.setValue(
+      "allowRescheduling",
+      {
+        ...currentValue,
+        [field]: value,
+      },
+      { shouldDirty: true }
+    );
+  };
+
+  const handleReschedulingToggleChange = (enabled: boolean) => {
+    const currentValue = formMethods.getValues("allowRescheduling");
+    formMethods.setValue(
+      "allowRescheduling",
+      {
+        ...currentValue,
+        enabled,
+        maxHours: enabled ? currentValue?.maxHours ?? 24 : null,
+        maxDays: enabled ? currentValue?.maxDays ?? 7 : null,
+      },
+      { shouldDirty: true }
+    );
+  };
+
+  const handleCancellationToggleChange = (enabled: boolean) => {
+    const currentValue = formMethods.getValues("allowCancellation");
+    formMethods.setValue(
+      "allowCancellation",
+      {
+        ...currentValue,
+        enabled,
+        maxHours: enabled ? currentValue?.maxHours ?? 24 : null,
+        maxDays: enabled ? currentValue?.maxDays ?? 7 : null,
+      },
+      { shouldDirty: true }
+    );
+  };
+
+  const handleCancellationLimitChange = (field: "maxHours" | "maxDays", value: number | null) => {
+    const currentValue = formMethods.getValues("allowCancellation");
+    formMethods.setValue(
+      "allowCancellation",
+      {
+        ...currentValue,
+        [field]: value,
+      },
+      { shouldDirty: true }
+    );
+  };
 
   return (
     <div>
@@ -279,6 +397,112 @@ export const EventLimitsTab = ({ eventType }: Pick<EventTypeSetupProps, "eventTy
           </div>
         </div>
       </div>
+      <Controller
+        name="allowRescheduling"
+        render={({ field: { value } }) => {
+          const isEnabled = value?.enabled ?? false;
+          return (
+            <SettingsToggle
+              labelClassName="text-sm"
+              toggleSwitchAtTheEnd={true}
+              switchContainerClassName={classNames(
+                "border-subtle mt-6 rounded-lg border py-6 px-4 sm:px-6",
+                isEnabled && "rounded-b-none"
+              )}
+              childrenClassName="lg:ml-0"
+              title={allowRescheduling}
+              description={allowReschedulingDescription}
+              checked={isEnabled}
+              onCheckedChange={handleReschedulingToggleChange}>
+              {isEnabled && (
+                <div className="border-subtle rounded-b-lg border border-t-0 p-6">
+                  <ReschedulingLimitInput
+                    hoursValue={value?.maxHours ?? 0}
+                    daysValue={value?.maxDays ?? 0}
+                    onHoursChange={(newValue) => handleReschedulingLimitChange("maxHours", newValue)}
+                    onDaysChange={(newValue) => handleReschedulingLimitChange("maxDays", newValue)}
+                    disabled={value?.maxHours === null && value?.maxDays === null}
+                    hoursLabel={t("hours")}
+                    daysLabel={t("days")}
+                  />
+                  <div className="mt-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={value?.maxHours === null && value?.maxDays === null}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            handleReschedulingLimitChange("maxHours", null);
+                            handleReschedulingLimitChange("maxDays", null);
+                          } else {
+                            handleReschedulingLimitChange("maxHours", 24);
+                            handleReschedulingLimitChange("maxDays", 7);
+                          }
+                        }}
+                        className="mr-2"
+                      />
+                      <span>{noReschedulingLimit}</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </SettingsToggle>
+          );
+        }}
+      />
+      <Controller
+        name="allowCancellation"
+        render={({ field: { value } }) => {
+          const isEnabled = value?.enabled ?? false;
+          return (
+            <SettingsToggle
+              labelClassName="text-sm"
+              toggleSwitchAtTheEnd={true}
+              switchContainerClassName={classNames(
+                "border-subtle mt-6 rounded-lg border py-6 px-4 sm:px-6",
+                isEnabled && "rounded-b-none"
+              )}
+              childrenClassName="lg:ml-0"
+              title={allowCancellation}
+              description={allowCancellationDescription}
+              checked={isEnabled}
+              onCheckedChange={handleCancellationToggleChange}>
+              {isEnabled && (
+                <div className="border-subtle rounded-b-lg border border-t-0 p-6">
+                  <ReschedulingLimitInput
+                    hoursValue={value?.maxHours ?? 0}
+                    daysValue={value?.maxDays ?? 0}
+                    onHoursChange={(newValue) => handleCancellationLimitChange("maxHours", newValue)}
+                    onDaysChange={(newValue) => handleCancellationLimitChange("maxDays", newValue)}
+                    disabled={value?.maxHours === null && value?.maxDays === null}
+                    hoursLabel={t("hours")}
+                    daysLabel={t("days")}
+                  />
+                  <div className="mt-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={value?.maxHours === null && value?.maxDays === null}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            handleCancellationLimitChange("maxHours", null);
+                            handleCancellationLimitChange("maxDays", null);
+                          } else {
+                            handleCancellationLimitChange("maxHours", 24);
+                            handleCancellationLimitChange("maxDays", 7);
+                          }
+                        }}
+                        className="mr-2"
+                      />
+                      <span>{noCancellationLimit}</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </SettingsToggle>
+          );
+        }}
+      />
       <Controller
         name="bookingLimits"
         render={({ field: { value } }) => {

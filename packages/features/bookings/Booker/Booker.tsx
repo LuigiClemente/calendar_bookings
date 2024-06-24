@@ -1,5 +1,9 @@
 import { LazyMotion, m, AnimatePresence } from "framer-motion";
+import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { useRouter, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useMemo } from "react";
 import StickyBox from "react-sticky-box";
 import { shallow } from "zustand/shallow";
@@ -28,11 +32,6 @@ import { Away, NotFound } from "./components/Unavailable";
 import { fadeInLeft, getBookerSizeClassNames, useBookerResizeAnimation } from "./config";
 import { useBookerStore } from "./store";
 import type { BookerProps, WrappedBookerProps } from "./types";
-import { useRouter, usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
-import type { Session } from "next-auth";
-import { useSearchParams } from 'next/navigation';
-
 
 const loadFramerFeatures = () => import("./framer-features").then((res) => res.default);
 const PoweredBy = dynamic(() => import("@calcom/ee/components/PoweredBy"));
@@ -72,8 +71,6 @@ const BookerComponent = ({
   customClassNames,
   session,
 }: BookerProps & WrappedBookerProps & { session: Session }) => {
-
-
   const { t } = useLocale();
   const [bookerState, setBookerState] = useBookerStore((state) => [state.state, state.setState], shallow);
   const selectedDate = useBookerStore((state) => state.selectedDate);
@@ -106,8 +103,8 @@ const BookerComponent = ({
     nonEmptyScheduleDays.length < extraDays
       ? (extraDays - nonEmptyScheduleDays.length + 1) * totalWeekDays
       : nonEmptyScheduleDays.length === extraDays
-        ? totalWeekDays
-        : 0;
+      ? totalWeekDays
+      : 0;
   // Taking one more available slot(extraDays + 1) to calculate the no of days in between, that next and prev button need to shift.
   const availableSlots = nonEmptyScheduleDays.slice(0, extraDays + 1);
   if (nonEmptyScheduleDays.length !== 0)
@@ -147,9 +144,6 @@ const BookerComponent = ({
     if (!selectedTimeslot) return setBookerState("selecting_time");
     return setBookerState("booking");
   }, [event, selectedDate, selectedTimeslot, setBookerState]);
-
-
-
 
   const EventBooker = useMemo(() => {
     return bookerState === "booking" ? (
@@ -297,7 +291,7 @@ const BookerComponent = ({
                 className={classNames(
                   layout === BookerLayouts.MONTH_VIEW && "fixed top-4 z-10 ltr:right-4 rtl:left-4",
                   (layout === BookerLayouts.COLUMN_VIEW || layout === BookerLayouts.WEEK_VIEW) &&
-                  "bg-default dark:bg-muted sticky top-0 z-10"
+                    "bg-default dark:bg-muted sticky top-0 z-10"
                 )}>
                 {!isPlatform ? (
                   <Header
@@ -425,7 +419,7 @@ const BookerComponent = ({
               className={classNames(
                 "border-subtle rtl:border-default flex h-full w-full flex-col overflow-x-auto px-5 py-3 pb-0 rtl:border-r ltr:md:border-l",
                 layout === BookerLayouts.MONTH_VIEW &&
-                "h-full overflow-hidden md:w-[var(--booker-timeslots-width)]",
+                  "h-full overflow-hidden md:w-[var(--booker-timeslots-width)]",
                 layout !== BookerLayouts.MONTH_VIEW && "sticky top-0"
               )}
               ref={timeslotsRef}
@@ -481,10 +475,13 @@ export const Booker = (props: BookerProps & WrappedBookerProps) => {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
 
+  console.log("Booker props", props);
+
   useEffect(() => {
+    console.log("Booker session", session);
     if (path) {
-      if (status === 'unauthenticated') {
-        const callbackUrl = searchParams?.get('callbackUrl');
+      if (status === "unauthenticated") {
+        const callbackUrl = searchParams?.get("callbackUrl");
         if (callbackUrl) {
           router.replace(decodeURIComponent(callbackUrl));
         } else {
@@ -493,16 +490,19 @@ export const Booker = (props: BookerProps & WrappedBookerProps) => {
       }
     }
   }, [status]);
+  console.log("Booker session", session);
+  console.log("Booker status", status);
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return <p>Loading...</p>;
   }
 
-  if (session !== null) return (
-    <LazyMotion strict features={loadFramerFeatures}>
-      <BookerComponent {...props} session={session} />
-    </LazyMotion>
-  );
+  if (session !== null)
+    return (
+      <LazyMotion strict features={loadFramerFeatures}>
+        <BookerComponent {...props} session={session} />
+      </LazyMotion>
+    );
 
   return null;
 };

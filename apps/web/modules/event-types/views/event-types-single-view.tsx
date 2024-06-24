@@ -155,10 +155,11 @@ const EventTypePage = (props: EventTypeSetupProps) => {
 
   const { eventType, locationOptions, team, teamMembers, currentUserMembership, destinationCalendar } = props;
   const [animationParentRef] = useAutoAnimate<HTMLDivElement>();
+
   const updateMutation = trpc.viewer.eventTypes.update.useMutation({
     onSuccess: async () => {
       const currentValues = formMethods.getValues();
-
+      console.log(currentValues);
       currentValues.children = currentValues.children.map((child) => ({
         ...child,
         created: true,
@@ -232,6 +233,8 @@ const EventTypePage = (props: EventTypeSetupProps) => {
       eventName: eventType.eventName || "",
       scheduleName: eventType.scheduleName,
       periodDays: eventType.periodDays,
+      allowRescheduling: eventType.allowRescheduling,
+      allowCancellation: eventType.allowCancellation,
       requiresBookerEmailVerification: eventType.requiresBookerEmailVerification,
       seatsPerTimeSlot: eventType.seatsPerTimeSlot,
       seatsShowAttendees: eventType.seatsShowAttendees,
@@ -386,6 +389,8 @@ const EventTypePage = (props: EventTypeSetupProps) => {
     formState: { isDirty: isFormDirty, dirtyFields },
   } = formMethods;
 
+  console.log(formMethods.getValues());
+
   const appsMetadata = formMethods.getValues("metadata")?.apps;
   const availability = formMethods.watch("availability");
   let numberOfActiveApps = 0;
@@ -499,6 +504,7 @@ const EventTypePage = (props: EventTypeSetupProps) => {
   };
 
   const getDirtyFields = (values: FormValues): Partial<FormValues> => {
+    console.log("Form is dirty:", isFormDirty); // Log form dirty state
     if (!isFormDirty) {
       return {};
     }
@@ -513,12 +519,19 @@ const EventTypePage = (props: EventTypeSetupProps) => {
         updatedFields[typedKey] = values[typedKey];
       }
     });
+    console.log("updatedFields", updatedFields);
     return updatedFields;
   };
 
   const handleSubmit = async (values: FormValues) => {
+    console.log("Form submitted");
     const { children } = values;
-    const dirtyValues = getDirtyFields(values);
+    console.log("children", children);
+    console.log("values", values);
+    console.log("eventType", getDirtyFields(values));
+    const dirtyValues = await getDirtyFields(values);
+    console.log("dirtyValues", dirtyValues);
+
     const dirtyFieldExists = Object.keys(dirtyValues).length !== 0;
     const {
       periodDates,
@@ -546,8 +559,13 @@ const EventTypePage = (props: EventTypeSetupProps) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       multipleDurationEnabled,
       length,
+      allowRescheduling,
+      allowCancellation,
       ...input
     } = dirtyValues;
+
+    console.log("input", input);
+    console.log("allowRescheduling", allowRescheduling);
     if (!Number(length)) throw new Error(t("event_setup_length_error"));
 
     if (bookingLimits) {
@@ -609,7 +627,11 @@ const EventTypePage = (props: EventTypeSetupProps) => {
       customInputs,
       children,
       assignAllTeamMembers,
+      allowRescheduling,
+      allowCancellation,
     };
+
+    console.log("payload", payload);
     // Filter out undefined values
     const filteredPayload = Object.entries(payload).reduce((acc, [key, value]) => {
       if (value !== undefined) {
@@ -620,6 +642,7 @@ const EventTypePage = (props: EventTypeSetupProps) => {
     }, {});
 
     if (dirtyFieldExists) {
+      console.log("Dirty field exists, calling mutation");
       updateMutation.mutate({ ...filteredPayload, id: eventType.id });
     }
   };
@@ -675,7 +698,11 @@ const EventTypePage = (props: EventTypeSetupProps) => {
           id="event-type-form"
           handleSubmit={async (values) => {
             const { children } = values;
+            console.log("children", children);
+            console.log("values", values);
+            console.log("eventType", getDirtyFields(values));
             const dirtyValues = getDirtyFields(values);
+            console.log("dirtyValues", dirtyValues);
             const dirtyFieldExists = Object.keys(dirtyValues).length !== 0;
             const {
               periodDates,
@@ -698,6 +725,8 @@ const EventTypePage = (props: EventTypeSetupProps) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               multipleDurationEnabled,
               length,
+              allowRescheduling,
+              allowCancellation,
               ...input
             } = dirtyValues;
 
@@ -756,6 +785,8 @@ const EventTypePage = (props: EventTypeSetupProps) => {
               seatsShowAvailabilityCount,
               metadata,
               customInputs,
+              allowRescheduling,
+              allowCancellation,
             };
             // Filter out undefined values
             const filteredPayload = Object.entries(payload).reduce((acc, [key, value]) => {
@@ -765,6 +796,8 @@ const EventTypePage = (props: EventTypeSetupProps) => {
               }
               return acc;
             }, {});
+
+            console.log("payload", filteredPayload);
 
             if (dirtyFieldExists) {
               updateMutation.mutate({ ...filteredPayload, id: eventType.id });

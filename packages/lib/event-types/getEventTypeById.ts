@@ -178,6 +178,8 @@ export const getEventTypeById = async ({
           priority: true,
         },
       },
+      allowRescheduling: true,
+      allowCancellation: true,
       userId: true,
       price: true,
       children: {

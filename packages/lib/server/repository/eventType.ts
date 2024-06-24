@@ -111,6 +111,8 @@ export class EventTypeRepository {
           user: { select: userSelect },
         },
       },
+      allowRescheduling: true, // Add this line
+      allowCancellation: true, // Add this line
     };
 
     log.debug(

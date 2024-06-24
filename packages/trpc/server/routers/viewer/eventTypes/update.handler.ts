@@ -62,8 +62,12 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     offsetStart,
     secondaryEmailId,
     aiPhoneCallConfig,
+    allowRescheduling,
+    allowCancellation,
     ...rest
   } = input;
+
+  console.log("input", input);
 
   const eventType = await ctx.prisma.eventType.findUniqueOrThrow({
     where: { id },
@@ -120,6 +124,8 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     },
   });
 
+  console.log("eventType", eventType);
+
   if (input.teamId && eventType.team?.id && input.teamId !== eventType.team.id) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -133,6 +139,45 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     bookingFields,
     metadata: rest.metadata === null ? Prisma.DbNull : (rest.metadata as Prisma.InputJsonObject),
   };
+  console.log("data", data);
+
+  // Handle allowRescheduling
+  if (allowRescheduling !== undefined) {
+    data.allowRescheduling = {
+      upsert: {
+        create: {
+          enabled: allowRescheduling.enabled,
+          maxHours: allowRescheduling.maxHours,
+          maxDays: allowRescheduling.maxDays,
+        },
+        update: {
+          enabled: allowRescheduling.enabled,
+          maxHours: allowRescheduling.maxHours,
+          maxDays: allowRescheduling.maxDays,
+        },
+      },
+    };
+  }
+
+  // Handle allowCancellation
+  if (allowCancellation !== undefined) {
+    data.allowCancellation = {
+      upsert: {
+        create: {
+          enabled: allowCancellation.enabled,
+          maxHours: allowCancellation.maxHours,
+          maxDays: allowCancellation.maxDays,
+        },
+        update: {
+          enabled: allowCancellation.enabled,
+          maxHours: allowCancellation.maxHours,
+          maxDays: allowCancellation.maxDays,
+        },
+      },
+    };
+  }
+
+  console.log("data", data);
   data.locations = locations ?? undefined;
   if (periodType) {
     data.periodType = handlePeriodType(periodType);
@@ -398,13 +443,23 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     schedulingType: true,
   });
   let updatedEventType: Prisma.EventTypeGetPayload<{ select: typeof updatedEventTypeSelect }>;
+  console.log("data", data);
   try {
+    console.log("id", id);
+    console.log("data", data);
+    console.log("updatedEventTypeSelect", updatedEventTypeSelect);
+    //filter if allowRescheduling or allowCancellation is undefined
+
+
+
     updatedEventType = await ctx.prisma.eventType.update({
       where: { id },
       data,
       select: updatedEventTypeSelect,
     });
+    console.log("updatedEventType", updatedEventType);
   } catch (e) {
+    console.log("e", e);
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       if (e.code === "P2002") {
         // instead of throwing a 500 error, catch the conflict and throw a 400 error.
@@ -420,6 +475,8 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     }
     return acc;
   }, {});
+
+  console.log("updatedValues", updatedValues);
 
   // Handling updates to children event types (managed events types)
   await updateChildrenEventTypes({

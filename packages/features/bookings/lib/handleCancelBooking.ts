@@ -105,6 +105,8 @@ async function getBookingToDelete(id: number | undefined, uid: string | undefine
             },
           },
           parentId: true,
+          allowRescheduling: true,
+          allowCancellation: true,
         },
       },
       uid: true,
@@ -132,12 +134,37 @@ export type CustomRequest = NextApiRequest & {
   platformBookingUrl?: string;
 };
 
+function isCancellationAllowed(
+  allowCancellation: { enabled: boolean; maxHours?: number; maxDays?: number } | null | undefined,
+  originalBookingCreatedTime: Date
+): boolean {
+  console.log("allowCancellation", allowCancellation);
+  if (!allowCancellation || !allowCancellation.enabled) {
+    return false;
+  }
+
+  console.log("allowCancellation", allowCancellation);
+  const now = dayjs();
+  const bookingCreatedAt = dayjs(originalBookingCreatedTime);
+  const hoursSinceCreation = now.diff(bookingCreatedAt, 'hour');
+
+  if (allowCancellation.maxHours && hoursSinceCreation > allowCancellation.maxHours) {
+    return false;
+  }
+
+  if (allowCancellation.maxDays && hoursSinceCreation > allowCancellation.maxDays * 24) {
+    return false;
+  }
+
+  return true;
+}
+
 async function handler(req: CustomRequest) {
   const { id, uid, allRemainingBookings, cancellationReason, seatReferenceUid } =
     schemaBookingCancelParams.parse(req.body);
   req.bookingToDelete = await getBookingToDelete(id, uid);
 
- 
+
 
   const {
     bookingToDelete,
@@ -148,17 +175,19 @@ async function handler(req: CustomRequest) {
     platformRescheduleUrl,
   } = req;
 
-  
+
 
   if (!bookingToDelete || !bookingToDelete.user) {
     throw new HttpError({ statusCode: 400, message: "Booking not found" });
   }
 
-  const bookingCreatedAt = dayjs(bookingToDelete.createdAt);
-  const now = dayjs();
+  const allowCancellation = bookingToDelete.eventType?.allowCancellation;
+  console.log("allowCancellation", allowCancellation);
 
-  if (now.diff(bookingCreatedAt, 'hour') > 24) {
-    throw new HttpError({ statusCode: 400, message: "Cannot cancel a booking that was created more than 24 hours ago" });
+  console.log("bookingToDelete.createdAt", bookingToDelete.createdAt);
+
+  if (!isCancellationAllowed(allowCancellation, bookingToDelete.createdAt)) {
+    throw new HttpError({ statusCode: 400, message: "Cancellation is not allowed for this booking" });
   }
 
   if (!bookingToDelete.userId) {
@@ -283,8 +312,8 @@ async function handler(req: CustomRequest) {
     destinationCalendar: bookingToDelete?.destinationCalendar
       ? [bookingToDelete?.destinationCalendar]
       : bookingToDelete?.user.destinationCalendar
-      ? [bookingToDelete?.user.destinationCalendar]
-      : [],
+        ? [bookingToDelete?.user.destinationCalendar]
+        : [],
     cancellationReason: cancellationReason,
     ...(teamMembers && {
       team: { name: bookingToDelete?.eventType?.team?.name || "Nameless", members: teamMembers, id: teamId! },
