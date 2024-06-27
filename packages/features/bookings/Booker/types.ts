@@ -13,6 +13,7 @@ import type { BookerLayouts } from "@calcom/prisma/zod-utils";
 
 import type { GetBookingType } from "../lib/get-booking";
 
+
 export interface BookerProps {
   eventSlug: string;
   username: string;

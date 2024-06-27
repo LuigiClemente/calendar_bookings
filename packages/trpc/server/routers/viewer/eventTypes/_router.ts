@@ -104,6 +104,8 @@ export const eventTypesRouter = router({
   get,
 
   update: eventOwnerProcedure.input(ZUpdateInputSchema).mutation(async ({ ctx, input }) => {
+    console.log("update");
+    console.log(input);
     if (!UNSTABLE_HANDLER_CACHE.update) {
       UNSTABLE_HANDLER_CACHE.update = await import("./update.handler").then((mod) => mod.updateHandler);
     }

@@ -38,6 +38,16 @@ export type FormValues = {
   offsetStart: number;
   description: string;
   disableGuests: boolean;
+  allowRescheduling: {
+    enabled: boolean;
+    maxHours: number | null;
+    maxDays: number | null;
+  };
+  allowCancellation: {
+    enabled: boolean;
+    maxHours: number | null;
+    maxDays: number | null;
+  };
   lockTimeZoneToggleOnBookingPage: boolean;
   requiresConfirmation: boolean;
   requiresBookerEmailVerification: boolean;

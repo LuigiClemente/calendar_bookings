@@ -8,6 +8,8 @@ import getLocationOptionsForSelect from "@calcom/features/bookings/lib/getLocati
 import { FormBuilderField } from "@calcom/features/form-builder/FormBuilderField";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import type { RouterOutputs } from "@calcom/trpc/react";
+import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 
 import { SystemField } from "../../../lib/SystemField";
 
@@ -24,6 +26,7 @@ export const BookingFields = ({
   bookingData?: GetBookingType | null;
   isDynamicGroupBooking: boolean;
 }) => {
+
   const { t } = useLocale();
   const { watch, setValue } = useFormContext();
   const locationResponse = watch("responses.location");
@@ -88,6 +91,14 @@ export const BookingFields = ({
           if (locationResponse?.value === "attendeeInPerson" || "phone") {
             readOnly = false;
           }
+        }
+
+        if (field.name === SystemField.Enum.email) {
+          readOnly = true;
+        }
+
+        if (field.name === SystemField.Enum.name) {
+          readOnly = true;
         }
 
         // Dynamically populate location field options

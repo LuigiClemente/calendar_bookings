@@ -1,7 +1,7 @@
 import type { TFunction } from "next-i18next";
 import { Trans } from "next-i18next";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import type { FieldError } from "react-hook-form";
 
 import { IS_CALCOM, WEBSITE_URL } from "@calcom/lib/constants";
@@ -15,6 +15,7 @@ import type { UseBookingFormReturnType } from "../hooks/useBookingForm";
 import type { IUseBookingErrors, IUseBookingLoadingStates } from "../hooks/useBookings";
 import { BookingFields } from "./BookingFields";
 import { FormSkeleton } from "./Skeleton";
+import type { Session } from "next-auth";
 
 type BookEventFormProps = {
   onCancel?: () => void;
@@ -27,6 +28,7 @@ type BookEventFormProps = {
   renderConfirmNotVerifyEmailButtonCond: boolean;
   extraOptions: Record<string, string | string[]>;
   isPlatform?: boolean;
+  session: Session;
 };
 
 export const BookEventForm = ({
@@ -42,10 +44,12 @@ export const BookEventForm = ({
   children,
   extraOptions,
   isPlatform = false,
+  session,
 }: Omit<BookEventFormProps, "event"> & {
   eventQuery: useEventReturnType;
   rescheduleUid: string | null;
 }) => {
+
   const eventType = eventQuery.data;
   const setFormValues = useBookerStore((state) => state.setFormValues);
   const bookingData = useBookerStore((state) => state.bookingData);
@@ -61,6 +65,17 @@ export const BookEventForm = ({
     const paymentAppData = getPaymentAppData(eventType);
     return eventType?.price > 0 && !Number.isNaN(paymentAppData.price) && paymentAppData.price > 0;
   }, [eventType]);
+
+  useEffect(() => {
+    if (session && session.user) {
+      bookingForm.setValue("responses.email", session.user.email || "");
+      bookingForm.setValue("responses.name", session.user.name || "");
+    } else {
+      // Clear the form values if session is not available
+      bookingForm.setValue("responses.email", "");
+      bookingForm.setValue("responses.name", "");
+    }
+  }, [session, bookingForm]);
 
   if (eventQuery.isError) return <Alert severity="warning" message={t("error_booking_event")} />;
   if (eventQuery.isPending || !eventQuery.data) return <FormSkeleton />;
@@ -79,6 +94,8 @@ export const BookEventForm = ({
     console.warn("No event type found for event", extraOptions);
     return <Alert severity="warning" message={t("error_booking_event")} />;
   }
+
+
 
   return (
     <div className="flex h-full flex-col">
@@ -149,10 +166,10 @@ export const BookEventForm = ({
                 {rescheduleUid && bookingData
                   ? t("reschedule")
                   : renderConfirmNotVerifyEmailButtonCond
-                  ? isPaidEvent
-                    ? t("pay_and_book")
-                    : t("confirm")
-                  : t("verify_email_email_button")}
+                    ? isPaidEvent
+                      ? t("pay_and_book")
+                      : t("confirm")
+                    : t("verify_email_email_button")}
               </Button>
             </>
           )}

@@ -117,6 +117,20 @@ const publicEventSelect = Prisma.validator<Prisma.EventTypeSelect>()({
   },
   hidden: true,
   assignAllTeamMembers: true,
+  allowRescheduling: {
+    select: {
+      enabled: true,
+      maxHours: true,
+      maxDays: true,
+    },
+  },
+  allowCancellation: {
+    select: {
+      enabled: true,
+      maxHours: true,
+      maxDays: true,
+    },
+  },
 });
 
 // TODO: Convert it to accept a single parameter with structured data

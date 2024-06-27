@@ -61,24 +61,24 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
     ),
     shouldListUserEvents
       ? EventTypeRepository.findAllByUpId(
-          {
-            upId: userProfile.upId,
-            userId: user.id,
+        {
+          upId: userProfile.upId,
+          userId: user.id,
+        },
+        {
+          where: {
+            teamId: null,
           },
-          {
-            where: {
-              teamId: null,
+          orderBy: [
+            {
+              position: "desc",
             },
-            orderBy: [
-              {
-                position: "desc",
-              },
-              {
-                id: "asc",
-              },
-            ],
-          }
-        )
+            {
+              id: "asc",
+            },
+          ],
+        }
+      )
       : [],
   ]);
 
@@ -101,10 +101,27 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
     })
   );
 
-  type UserEventTypes = (typeof profileEventTypes)[number];
+  type UserEventTypes = (typeof profileEventTypes)[number] & {
+    allowRescheduling: {
+      id: number;
+      enabled: boolean;
+      maxHours: number | null;
+      maxDays: number | null;
+      noLimit: boolean;
+    } | null;
+    allowCancellation: {
+      id: number;
+      enabled: boolean;
+      maxHours: number | null;
+      maxDays: number | null;
+      noLimit: boolean;
+    } | null;
+  };
 
   const mapEventType = async (eventType: UserEventTypes) => ({
     ...eventType,
+    allowRescheduling: eventType.allowRescheduling,
+    allowCancellation: eventType.allowCancellation,
     safeDescription: eventType?.description ? markdownToSafeHTML(eventType.description) : undefined,
     users: await Promise.all(
       (!!eventType?.hosts?.length ? eventType?.hosts.map((host) => host.user) : eventType.users).map(
@@ -244,7 +261,14 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
             slug = team.slug ? (!team.parentId ? `team/${team.slug}` : `${team.slug}`) : null;
           }
 
-          const eventTypes = await Promise.all(team.eventTypes.map(mapEventType));
+          console.log(JSON.stringify(team.eventTypes[0], null, 2));
+
+          const eventTypes = await Promise.all(team.eventTypes.map((et): UserEventTypes => ({
+            ...et,
+            allowRescheduling: et.allowRescheduling,
+            allowCancellation: et.allowCancellation,
+          })).map(mapEventType));
+
           const teamParentMetadata = team.parent ? teamMetadataSchema.parse(team.parent.metadata) : null;
           return {
             teamId: team.id,
@@ -257,16 +281,16 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
             profile: {
               image: team.parentId
                 ? getOrgAvatarUrl({
-                    slug: team.parent?.slug || null,
-                    logoUrl: team.parent?.logoUrl,
-                    requestedSlug: team.slug,
-                  })
+                  slug: team.parent?.slug || null,
+                  logoUrl: team.parent?.logoUrl,
+                  requestedSlug: team.slug,
+                })
                 : getTeamAvatarUrl({
-                    slug: team.slug,
-                    logoUrl: team.logoUrl,
-                    requestedSlug: team.metadata?.requestedSlug ?? null,
-                    organizationId: team.parentId,
-                  }),
+                  slug: team.slug,
+                  logoUrl: team.logoUrl,
+                  requestedSlug: team.metadata?.requestedSlug ?? null,
+                  organizationId: team.parentId,
+                }),
               name: team.name,
               slug,
             },

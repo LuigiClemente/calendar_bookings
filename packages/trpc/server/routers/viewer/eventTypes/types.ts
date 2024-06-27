@@ -55,6 +55,20 @@ export const EventTypeUpdateInput = _EventTypeModel
     schedule: z.number().nullable().optional(),
     hashedLink: z.string(),
     assignAllTeamMembers: z.boolean().optional(),
+    allowRescheduling: z
+      .object({
+        enabled: z.boolean(),
+        maxHours: z.number().nullable(),
+        maxDays: z.number().nullable(),
+      })
+      .optional(),
+    allowCancellation: z
+      .object({
+        enabled: z.boolean(),
+        maxHours: z.number().nullable(),
+        maxDays: z.number().nullable(),
+      })
+      .optional(),
   })
   .partial()
   .extend({

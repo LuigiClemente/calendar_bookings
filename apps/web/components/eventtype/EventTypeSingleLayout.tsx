@@ -204,6 +204,8 @@ function EventTypeSingleLayout({
     formMethods,
   });
 
+  console.log(formMethods.getValues("allowRescheduling")?.enabled)
+
   const length = formMethods.watch("length");
   const multipleDuration = formMethods.watch("metadata")?.multipleDuration;
 

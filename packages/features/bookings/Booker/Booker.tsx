@@ -1,5 +1,9 @@
 import { LazyMotion, m, AnimatePresence } from "framer-motion";
+import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { useRouter, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useMemo } from "react";
 import StickyBox from "react-sticky-box";
 import { shallow } from "zustand/shallow";
@@ -65,7 +69,8 @@ const BookerComponent = ({
   isPlatform,
   orgBannerUrl,
   customClassNames,
-}: BookerProps & WrappedBookerProps) => {
+  session,
+}: BookerProps & WrappedBookerProps & { session: Session }) => {
   const { t } = useLocale();
   const [bookerState, setBookerState] = useBookerStore((state) => [state.state, state.setState], shallow);
   const selectedDate = useBookerStore((state) => state.selectedDate);
@@ -143,6 +148,7 @@ const BookerComponent = ({
   const EventBooker = useMemo(() => {
     return bookerState === "booking" ? (
       <BookEventForm
+        session={session}
         key={key}
         onCancel={() => {
           setSelectedTimeslot(null);
@@ -464,9 +470,37 @@ const BookerComponent = ({
 export const Booker = (props: BookerProps & WrappedBookerProps) => {
   if (props.isAway) return <Away />;
 
+  const router = useRouter();
+  const path = usePathname();
+  const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      const callbackUrl = searchParams?.get("callbackUrl");
+      if (callbackUrl) {
+        router.replace(decodeURIComponent(callbackUrl));
+      } else {
+        router.push(`/auth/login-new?callbackUrl=${encodeURIComponent(path || "")}`);
+      }
+    }
+  }, [status, path, searchParams, router]);
+
+  // Show loading state while checking session
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  // Redirect or show nothing if not authenticated
+  if (status === "unauthenticated") {
+    return null;
+  }
+
+  // At this point, we're sure that status is "authenticated" and session is not null
   return (
     <LazyMotion strict features={loadFramerFeatures}>
-      <BookerComponent {...props} />
+      <BookerComponent {...props} session={session!} />
     </LazyMotion>
   );
 };
+
