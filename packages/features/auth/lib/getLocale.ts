@@ -27,12 +27,13 @@ export const getLocale = async (
         headers: ReadonlyHeaders;
       }
 ): Promise<string> => {
+
   const token = await getToken({
     req: req as GetTokenParams["req"],
   });
 
   const tokenLocale = token?.["locale"];
-
+console.log({tokenLocale})
   if (tokenLocale) {
     return tokenLocale;
   }
@@ -44,7 +45,7 @@ export const getLocale = async (
 
   const code: string = languages[0]?.code ?? "";
   const region: string = languages[0]?.region ?? "";
-
+console.log({acceptLanguage , languages , code , region})
   // the code should consist of 2 or 3 lowercase letters
   // the regex underneath is more permissive
   const testedCode = /^[a-zA-Z]+$/.test(code) ? code : "en";

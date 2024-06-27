@@ -200,6 +200,7 @@ const SettingsSidebarContainer = ({
   navigationIsOpenedOnMobile,
   bannersHeight,
 }: SettingsSidebarContainerProps) => {
+  console.log({navigationIsOpenedOnMobile})
   const searchParams = useCompatSearchParams();
   const { t } = useLocale();
   const tabsWithPermissions = useTabs();
@@ -273,15 +274,19 @@ const SettingsSidebarContainer = ({
     <nav
       style={{ maxHeight: `calc(100vh - ${bannersHeight}px)`, top: `${bannersHeight}px` }}
       className={classNames(
-        "no-scrollbar bg-muted fixed bottom-0 left-0 top-0 z-20 flex max-h-screen w-56 flex-col space-y-1 overflow-x-hidden overflow-y-scroll px-2 pb-3 transition-transform max-lg:z-10 lg:sticky lg:flex",
+        navigationIsOpenedOnMobile ? " bg-muted fixed bottom-0 left-0 top-0 z-20 flex max-h-screen w-56 flex-col space-y-1 overflow-x-hidden overflow-y-scroll px-2 pb-3 transition-transform max-lg:z-10 lg:sticky lg:flex" : " bg-muted  bottom-0 left-0 top-0 z-20 flex  w-56 flex-col space-y-1  px-2 pb-3 transition-transform max-lg:z-10  lg:flex  ",
         className,
         navigationIsOpenedOnMobile
           ? "translate-x-0 opacity-100"
           : "-translate-x-full opacity-0 lg:translate-x-0 lg:opacity-100"
+
+          ,
+          navigationIsOpenedOnMobile ? "w-auto" :"w-[0px]",
+          "lg:w-auto"
       )}
       aria-label="Tabs">
       <>
-        <BackButtonInSidebar name={t("back")} />
+        {/* <BackButtonInSidebar name={t("back")} /> */}
         {tabsWithPermissions.map((tab) => {
           return (
             <React.Fragment key={tab.href}>
@@ -295,13 +300,7 @@ const SettingsSidebarContainer = ({
                           className="h-[16px] w-[16px] stroke-[2px] ltr:mr-3 rtl:ml-3 md:mt-0"
                         />
                       )}
-                      {!tab.icon && tab?.avatar && (
-                        <img
-                          className="h-4 w-4 rounded-full ltr:mr-3 rtl:ml-3"
-                          src={tab?.avatar}
-                          alt="User Avatar"
-                        />
-                      )}
+                      
                       <Skeleton
                         title={tab.name}
                         as="p"
@@ -576,24 +575,19 @@ const SettingsSidebarContainer = ({
   );
 };
 
-const MobileSettingsContainer = (props: { onSideContainerOpen?: () => void }) => {
+const MobileSettingsContainer = (props: {sideContainerOpen :any, setSideContainerOpen:any, onSideContainerOpen?: () => void }) => {
   const { t } = useLocale();
   const router = useRouter();
 
   return (
     <>
-      <nav className="bg-muted border-muted sticky top-0 z-20 flex w-full items-center justify-between border-b py-2 sm:relative lg:hidden">
-        <div className="flex items-center space-x-3 ">
-          <Button StartIcon="menu" color="minimal" variant="icon" onClick={props.onSideContainerOpen}>
-            <span className="sr-only">{t("show_navigation")}</span>
+      <nav className="  lg:hidden">
+        <div className=" ">
+          <Button  color="minimal" variant="icon" onClick={props.onSideContainerOpen}>
+          Open Tabs
+         
           </Button>
 
-          <button
-            className="hover:bg-emphasis flex items-center space-x-2 rounded-md px-3 py-1 rtl:space-x-reverse"
-            onClick={() => router.back()}>
-            <Icon name="arrow-left" className="text-default h-4 w-4" />
-            <p className="text-emphasis font-semibold">{t("settings")}</p>
-          </button>
         </div>
       </nav>
     </>
@@ -634,19 +628,21 @@ export default function SettingsLayout({
       flexChildrenContainer
       hideHeadingOnMobile
       {...rest}
-      SidebarContainer={
-        <SidebarContainerElement
-          sideContainerOpen={sideContainerOpen}
-          setSideContainerOpen={setSideContainerOpen}
-        />
-      }
+    
       drawerState={state}
       MobileNavigationContainer={null}
-      TopNavContainer={
-        <MobileSettingsContainer onSideContainerOpen={() => setSideContainerOpen(!sideContainerOpen)} />
-      }>
-      <div className="flex flex-1 [&>*]:flex-1">
-        <div className="mx-auto max-w-full justify-center lg:max-w-3xl">
+      >
+      <div className="flex">
+        
+
+      <SidebarContainerElement
+          sideContainerOpen={sideContainerOpen}
+          setSideContainerOpen={setSideContainerOpen}
+          />
+      
+        <div className="grow mx-auto max-w-full justify-center lg:max-w-3xl">
+            <MobileSettingsContainer  sideContainerOpen={sideContainerOpen}
+          setSideContainerOpen={setSideContainerOpen} onSideContainerOpen={() => {console.log({sideContainerOpen});setSideContainerOpen(!sideContainerOpen)}} ></MobileSettingsContainer>
           <ShellHeader />
           <ErrorBoundary>
             <Suspense fallback={<Icon name="loader" />}>{children}</Suspense>

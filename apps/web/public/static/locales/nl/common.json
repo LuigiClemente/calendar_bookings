@@ -2123,5 +2123,20 @@
   "email_team_invite|heading|invited_to_regular_team": "U bent uitgenodigd om lid te worden van een {{appName}}-team",
   "email_team_invite|content|invited_to_regular_team": "{{invitedBy}} heeft u uitgenodigd om lid te worden van zijn team '{{teamName}}' op {{appName}}. {{appName}} is de gebeurtenissenplanner die u en uw team in staat stelt afspraken te plannen zonder heen en weer te e-mailen.",
   "privacy": "Privacy",
-  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Voeg uw nieuwe strings hierboven toe ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑"
+  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Voeg uw nieuwe strings hierboven toe ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+  "Resources": "Middelen",
+  "Store": "Winkel",
+  "Plans": "Plannen",
+  "Appointments": "Afspraken",
+  "Payments": "Betalingen",
+  "Documents": "Documenten",
+  "Personal": "Persoonlijk",
+  "Sign out": "Uitloggen",
+  "Blog": "Blog",
+  "Latest": "Laatste",
+  "description_heading": "Een blog gemaakt met Next.js en Tailwind.css",
+  "search_prompt": "Typ een opdracht of zoek.....",
+  "Content": "Inhoud",
+   "Search": "Zoeken",
+    "Teams": "Teams"
 }

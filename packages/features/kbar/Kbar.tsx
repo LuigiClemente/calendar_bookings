@@ -239,13 +239,14 @@ export const KBarContent = () => {
   return (
     <KBarPortal>
       <KBarPositioner>
-        <KBarAnimator className="bg-default z-10 w-full max-w-screen-sm overflow-hidden rounded-md shadow-lg">
-          <div className="border-subtle flex items-center justify-center border-b">
-            <Icon name="search" className="text-default mx-3 h-4 w-4" />
+        <KBarAnimator className="bg-default z-10 w-full max-w-xl overflow-hidden rounded-xl shadow-lg">
+          <div className="border-subtle flex items-center justify-center border-b gap-4 px-4">
+            <Icon name="search" className="text-gray-400 dark:text-gray-300 w-5 block text-[13px]" />
             <KBarSearch
               defaultPlaceholder={t("kbar_search_placeholder")}
-              className="bg-default placeholder:text-subtle text-default w-full rounded-sm py-2.5 focus-visible:outline-none"
+              className="h-8 w-full bg-transparent text-gray-600 placeholder-gray-400 focus:outline-none dark:text-gray-200 dark:placeholder-gray-500 border border-black focus:border-2 focus:border-[#2AE8D3] my-4 px-[0.75rem] py-[0.5rem]"
             />
+            <kbd className="inline-block whitespace-nowrap rounded border px-1.5 align-middle font-medium leading-4 tracking-wide text-xs text-gray-400 border-gray-400">ESC</kbd>
           </div>
           <RenderResults />
           <div className="text-subtle border-subtle hidden items-center space-x-1 border-t px-2 py-1.5 text-xs sm:flex">
@@ -307,14 +308,14 @@ function RenderResults() {
       items={results}
       onRender={({ item, active }) =>
         typeof item === "string" ? (
-          <div className="bg-default text-emphasis p-4 text-xs font-bold uppercase">{t(item)}</div>
+          <div className="bg-default text-emphasis p-4 text-xs font-bold uppercase !text-[#2AE8D3]">{t(item)}</div>
         ) : (
           <div
             // For seeing keyboard up & down navigation in action, we need visual feedback based on "active" prop
             style={{
-              background: active ? "var(--cal-bg-subtle)" : `var(--cal-bg-default)`,
-              borderLeft: active ? "2px solid var(--cal-border-default)" : "2px solid transparent",
-              color: "var(--cal-text)",
+              background: active ? "#2AE8D3" : `var(--cal-bg-default)`,
+              
+              color:active ?"white" : "var(--cal-text)",
             }}
             className="flex items-center justify-between px-4 py-2.5 text-sm hover:cursor-pointer">
             <span>{t(item.name)}</span>

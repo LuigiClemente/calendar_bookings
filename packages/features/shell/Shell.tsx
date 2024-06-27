@@ -1,7 +1,7 @@
 import type { User as UserAuth } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Dispatch, ReactElement, ReactNode, SetStateAction } from "react";
 import React, { cloneElement, Fragment, useEffect, useMemo, useState } from "react";
 import { Toaster } from "react-hot-toast";
@@ -81,7 +81,9 @@ import {
 
 import { useOrgBranding } from "../ee/organizations/context/provider";
 import FreshChatProvider from "../ee/support/lib/freshchat/FreshChatProvider";
+import { ApplicationHeader } from "./ApplicationHeader";
 import { TeamInviteBadge } from "./TeamInviteBadge";
+import { OtherHeader } from "./lowerHeader";
 
 // need to import without ssr to prevent hydration errors
 // const Tips = dynamic(() => import("@calcom/features/tips").then((mod) => mod.Tips), {
@@ -206,19 +208,48 @@ const useBanners = () => {
 
   return allBanners;
 };
-
+let langChanged = false;
 const Layout = (props: LayoutProps) => {
   const banners = useBanners();
-
+  console.log("I am good boy");
   const showIntercom = localStorage.getItem("showIntercom");
+  const { update, status } = useSession();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { boot } = useIntercom();
   const pageTitle = typeof props.heading === "string" && !props.title ? props.heading : props.title;
+  const utils = trpc.useContext();
+  const searchParams = useSearchParams();
+  const langLocale = searchParams?.get("language");
+  const mutation = trpc.viewer.updateProfile.useMutation({
+    onSuccess: async (res) => {
+      await utils.viewer.me.invalidate();
+
+      await update(res);
+
+      if (res.locale && typeof window !== "undefined") {
+        window.calNewLocale = res.locale;
+      }
+    },
+    onSettled: async () => {
+      await utils.viewer.me.invalidate();
+    },
+  });
 
   useEffect(() => {
     if (showIntercom === "false" || isMobile) return;
     boot();
   }, [showIntercom, isMobile]);
+  useEffect(() => {
+    console.log("I am lopoloplopol");
+    console.log({ langLocale, status });
+    if (langLocale && !langChanged) {
+      if (status !== "authenticated") return;
+      langChanged = true;
+      mutation.mutate({
+        locale: langLocale,
+      });
+    }
+  }, [langLocale, status]);
 
   const bannersHeight = useMemo(() => {
     const activeBanners =
@@ -247,7 +278,7 @@ const Layout = (props: LayoutProps) => {
       <TimezoneChangeDialog />
 
       <div className="flex min-h-screen flex-col">
-        {banners && (
+        {/* {banners && (
           <div className="sticky top-0 z-10 w-full divide-y divide-black">
             <UserV2OptInBanner />
             {Object.keys(banners).map((key) => {
@@ -275,13 +306,14 @@ const Layout = (props: LayoutProps) => {
               }
             })}
           </div>
-        )}
+        )} */}
 
         <div className="flex flex-1" data-testid="dashboard-shell">
           {props.SidebarContainer ? (
             cloneElement(props.SidebarContainer, { bannersHeight })
           ) : (
-            <SideBarContainer bannersHeight={bannersHeight} />
+            <></>
+            // <SideBarContainer bannersHeight={bannersHeight} />
           )}
           <div className="flex w-0 flex-1 flex-col">
             <MainContainer {...props} />
@@ -585,7 +617,7 @@ export type NavigationItemType = {
 const requiredCredentialNavigationItems = ["Routing Forms"];
 const MORE_SEPARATOR_NAME = "more";
 
-const navigation: NavigationItemType[] = [
+export const applicationNavigationMenus: NavigationItemType[] = [
   {
     name: "event_types_page_title",
     href: "/event-types",
@@ -663,30 +695,29 @@ const navigation: NavigationItemType[] = [
   },
 ];
 
-const moreSeparatorIndex = navigation.findIndex((item) => item.name === MORE_SEPARATOR_NAME);
+const moreSeparatorIndex = applicationNavigationMenus.findIndex((item) => item.name === MORE_SEPARATOR_NAME);
 // We create all needed navigation items for the different use cases
-const { desktopNavigationItems, mobileNavigationBottomItems, mobileNavigationMoreItems } = navigation.reduce<
-  Record<string, NavigationItemType[]>
->(
-  (items, item, index) => {
-    // We filter out the "more" separator in` desktop navigation
-    if (item.name !== MORE_SEPARATOR_NAME) items.desktopNavigationItems.push(item);
-    // Items for mobile bottom navigation
-    if (index < moreSeparatorIndex + 1 && !item.onlyDesktop) {
-      items.mobileNavigationBottomItems.push(item);
-    } // Items for the "more" menu in mobile navigation
-    else {
-      items.mobileNavigationMoreItems.push(item);
-    }
-    return items;
-  },
-  { desktopNavigationItems: [], mobileNavigationBottomItems: [], mobileNavigationMoreItems: [] }
-);
+const { desktopNavigationItems, mobileNavigationBottomItems, mobileNavigationMoreItems } =
+  applicationNavigationMenus.reduce<Record<string, NavigationItemType[]>>(
+    (items: any, item: any, index: any) => {
+      // We filter out the "more" separator in` desktop navigation
+      if (item.name !== MORE_SEPARATOR_NAME) items.desktopNavigationItems.push(item);
+      // Items for mobile bottom navigation
+      if (index < moreSeparatorIndex + 1 && !item.onlyDesktop) {
+        items.mobileNavigationBottomItems.push(item);
+      } // Items for the "more" menu in mobile navigation
+      else {
+        items.mobileNavigationMoreItems.push(item);
+      }
+      return items;
+    },
+    { desktopNavigationItems: [], mobileNavigationBottomItems: [], mobileNavigationMoreItems: [] }
+  );
 
 const Navigation = () => {
   return (
     <nav className="mt-2 flex-1 md:px-2 lg:mt-4 lg:px-0">
-      {desktopNavigationItems.map((item) => (
+      {desktopNavigationItems.map((item: any) => (
         <NavigationItem key={item.name} item={item} />
       ))}
       <div className="text-subtle mt-0.5 lg:hidden">
@@ -783,7 +814,7 @@ const MobileNavigation = () => {
           "pwa:pb-[max(0.625rem,env(safe-area-inset-bottom))] pwa:-mx-2 bg-muted border-subtle fixed bottom-0 left-0 z-30 flex w-full border-t bg-opacity-40 px-1 shadow backdrop-blur-md md:hidden",
           isEmbed && "hidden"
         )}>
-        {mobileNavigationBottomItems.map((item) => (
+        {mobileNavigationBottomItems.map((item: any) => (
           <MobileNavigationItem key={item.name} item={item} />
         ))}
       </nav>
@@ -861,7 +892,7 @@ type SideBarProps = {
 
 function SideBarContainer({ bannersHeight }: SideBarContainerProps) {
   const { status, data } = useSession();
-
+  console.log({ status, data });
   // Make sure that Sidebar is rendered optimistically so that a refresh of pages when logged in have SideBar from the beginning.
   // This improves the experience of refresh on app store pages(when logged in) which are SSG.
   // Though when logged out, app store pages would temporarily show SideBar until session status is confirmed.
@@ -1098,7 +1129,7 @@ function MainContainer({
     <main className="bg-default relative z-0 flex-1 focus:outline-none">
       {/* show top navigation for md and smaller (tablet and phones) */}
       {TopNavContainerProp}
-      <div className="max-w-full px-2 py-4 lg:px-6">
+      <div className="mx-auto w-full max-w-screen-xl  px-10 py-4 ">
         <ErrorBoundary>
           {!props.withoutMain ? <ShellMain {...props}>{props.children}</ShellMain> : props.children}
         </ErrorBoundary>
@@ -1112,7 +1143,12 @@ function MainContainer({
 function TopNavContainer() {
   const { status } = useSession();
   if (status !== "authenticated") return null;
-  return <TopNav />;
+  return (
+    <>
+      <ApplicationHeader />
+      <OtherHeader />
+    </>
+  );
 }
 
 function TopNav() {
@@ -1154,7 +1190,7 @@ export const MobileNavigationMoreItems = () => (
 function ProfileDropdown() {
   const { update, data: sessionData } = useSession();
   const { data } = trpc.viewer.me.useQuery();
-  console.log(data);
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   if (!data || !ENABLE_PROFILE_SWITCHER || !sessionData) {

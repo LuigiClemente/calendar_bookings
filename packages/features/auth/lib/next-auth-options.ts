@@ -213,10 +213,10 @@ const providers: Provider[] = [
         // User's identity provider is not "CAL"
         if (user.identityProvider !== IdentityProvider.CAL) return role;
 
-        if (process.env.NEXT_PUBLIC_IS_E2E) {
-          console.warn("E2E testing is enabled, skipping password and 2FA requirements for Admin");
-          return role;
-        }
+        // if (process.env.NEXT_PUBLIC_IS_E2E) {
+        //   console.warn("E2E testing is enabled, skipping password and 2FA requirements for Admin");
+        //   return role;
+        // }
 
         // User's password is valid and two-factor authentication is enabled
         if (isPasswordValid(credentials.password, false, true) && user.twoFactorEnabled) return role;
@@ -241,96 +241,96 @@ const providers: Provider[] = [
   ImpersonationProvider,
 ];
 
-providers.push(
-  {
-    id: "keycloak",
-    name: "Keycloak Login",
-    credentials: {
-      email: { label: "Email", type: "text" },
-      password: { label: "Password", type: "password" },
-    },
-    async authorize(credentials) {
-      if (!credentials) {
-        return null;
-      }
+// providers.push(
+//   {
+//     id: "keycloak",
+//     name: "Keycloak Login",
+//     credentials: {
+//       email: { label: "Email", type: "text" },
+//       password: { label: "Password", type: "password" },
+//     },
+//     async authorize(credentials) {
+//       if (!credentials) {
+//         return null;
+//       }
 
-      const { email, password } = credentials;
+//       const { email, password } = credentials;
 
-      if (!email || !password) {
-        return null;
-      }
+//       if (!email || !password) {
+//         return null;
+//       }
 
-      // Fetch access token from Keycloak
-      try {
-        const response = await axios.post(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/token`,
-          qs.stringify({
-            grant_type: 'password',
-            client_id: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_ID,
-            client_secret: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_SECRET,
-            username: email,
-            password: password,
-            scope: 'openid',
-          }), {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        });
+//       // Fetch access token from Keycloak
+//       try {
+//         const response = await axios.post(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/token`,
+//           qs.stringify({
+//             grant_type: 'password',
+//             client_id: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_ID,
+//             client_secret: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_SECRET,
+//             username: email,
+//             password: password,
+//             scope: 'openid',
+//           }), {
+//           headers: {
+//             'Content-Type': 'application/x-www-form-urlencoded',
+//           },
+//         });
 
-        const data = response.data;
+//         const data = response.data;
 
-        if (data.access_token) {
-          const userInfoResponse = await axios.get(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/userinfo`, {
-            headers: {
-              Authorization: `Bearer ${data.access_token}`,
-            },
-          });
+//         if (data.access_token) {
+//           const userInfoResponse = await axios.get(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/userinfo`, {
+//             headers: {
+//               Authorization: `Bearer ${data.access_token}`,
+//             },
+//           });
 
-          const userInfo = userInfoResponse.data;
+//           const userInfo = userInfoResponse.data;
 
-          if (!userInfo) {
-            return null;
-          }
+//           if (!userInfo) {
+//             return null;
+//           }
 
-          const { sub, given_name, family_name, email: userEmail } = userInfo;
-          let user = !userEmail
-            ? undefined
-            : await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
+//           const { sub, given_name, family_name, email: userEmail } = userInfo;
+//           let user = !userEmail
+//             ? undefined
+//             : await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
 
-          if (!user) {
-            const hostedCal = Boolean(HOSTED_CAL_FEATURES);
-            if (hostedCal && userEmail) {
-              const domain = getDomainFromEmail(userEmail);
-              const organizationId = await getVerifiedOrganizationByAutoAcceptEmailDomain(domain);
-              if (organizationId) {
-                const createUsersAndConnectToOrgProps = {
-                  emailsToCreate: [userEmail],
-                  organizationId,
-                  identityProvider: IdentityProvider.OIDC,
-                  identityProviderId: userEmail,
-                };
-                await createUsersAndConnectToOrg(createUsersAndConnectToOrgProps);
-                user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({
-                  email: userEmail,
-                });
-              }
-            }
-            if (!user) throw new Error(ErrorCode.UserNotFound);
-          }
+//           if (!user) {
+//             const hostedCal = Boolean(HOSTED_CAL_FEATURES);
+//             if (hostedCal && userEmail) {
+//               const domain = getDomainFromEmail(userEmail);
+//               const organizationId = await getVerifiedOrganizationByAutoAcceptEmailDomain(domain);
+//               if (organizationId) {
+//                 const createUsersAndConnectToOrgProps = {
+//                   emailsToCreate: [userEmail],
+//                   organizationId,
+//                   identityProvider: IdentityProvider.OIDC,
+//                   identityProviderId: userEmail,
+//                 };
+//                 await createUsersAndConnectToOrg(createUsersAndConnectToOrgProps);
+//                 user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({
+//                   email: userEmail,
+//                 });
+//               }
+//             }
+//             if (!user) throw new Error(ErrorCode.UserNotFound);
+//           }
 
-          const [userProfile] = user?.allProfiles;
-          return {
-            id: sub,
-            firstName: given_name,
-            lastName: family_name,
-            email: userEmail,
-            name: `${given_name} ${family_name}`.trim(),
-            email_verified: true,
-            profile: userProfile,
-          };
-        },
-        type: "credentials"
-      }
-)
+//           const [userProfile] = user?.allProfiles;
+//           return {
+//             id: sub,
+//             firstName: given_name,
+//             lastName: family_name,
+//             email: userEmail,
+//             name: `${given_name} ${family_name}`.trim(),
+//             email_verified: true,
+//             profile: userProfile,
+//           };
+//         },
+//         type: "credentials"
+//       }
+// )
 
 if (IS_GOOGLE_LOGIN_ENABLED) {
   providers.push(
