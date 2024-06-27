@@ -135,18 +135,26 @@ export type CustomRequest = NextApiRequest & {
 };
 
 function isCancellationAllowed(
-  allowCancellation: { enabled: boolean; maxHours?: number; maxDays?: number } | null | undefined,
+  allowCancellation: {
+    id: number;
+    enabled: boolean;
+    maxHours: number | null;
+    maxDays: number | null;
+    noLimit: boolean;
+  } | null | undefined,
   originalBookingCreatedTime: Date
 ): boolean {
-  console.log("allowCancellation", allowCancellation);
   if (!allowCancellation || !allowCancellation.enabled) {
     return false;
   }
 
-  console.log("allowCancellation", allowCancellation);
   const now = dayjs();
   const bookingCreatedAt = dayjs(originalBookingCreatedTime);
   const hoursSinceCreation = now.diff(bookingCreatedAt, 'hour');
+
+  if (allowCancellation.noLimit) {
+    return true;
+  }
 
   if (allowCancellation.maxHours && hoursSinceCreation > allowCancellation.maxHours) {
     return false;

@@ -888,7 +888,7 @@ export const findBookingQuery = async (bookingId: number) => {
           requiresConfirmation: true,
           requiresBookerEmailVerification: true,
           price: true,
-          allowReschedulling: true,
+          allowRescheduling: true,
           allowCancellation: true,
         },
       },
@@ -908,30 +908,38 @@ type BookingDataSchemaGetter =
   | typeof getBookingDataSchema
   | typeof import("@calcom/features/bookings/lib/getBookingDataSchemaForApi").default;
 
-function isReschedulingAllowed(
-  allowRescheduling: { enabled: boolean; maxHours?: number; maxDays?: number } | null | undefined,
-  originalBookingCreatedTime: Date
-): boolean {
-  console.log("allowRescheduling", allowRescheduling);
-  if (!allowRescheduling || !allowRescheduling.enabled) {
-    return false;
+  function isReschedulingAllowed(
+    allowRescheduling: {
+      id: number;
+      enabled: boolean;
+      maxHours: number | null;
+      maxDays: number | null;
+      noLimit: boolean;
+    } | null | undefined,
+    originalBookingCreatedTime: Date
+  ): boolean {
+    if (!allowRescheduling || !allowRescheduling.enabled) {
+      return false;
+    }
+  
+    if (allowRescheduling.noLimit) {
+      return true;
+    }
+  
+    const now = dayjs();
+    const bookingCreatedAt = dayjs(originalBookingCreatedTime);
+    const hoursSinceCreation = now.diff(bookingCreatedAt, 'hour');
+  
+    if (allowRescheduling.maxHours !== null && hoursSinceCreation > allowRescheduling.maxHours) {
+      return false;
+    }
+  
+    if (allowRescheduling.maxDays !== null && hoursSinceCreation > allowRescheduling.maxDays * 24) {
+      return false;
+    }
+  
+    return true;
   }
-
-  console.log("allowRescheduling", allowRescheduling);
-  const now = dayjs();
-  const bookingCreatedAt = dayjs(originalBookingCreatedTime);
-  const hoursSinceCreation = now.diff(bookingCreatedAt, 'hour');
-
-  if (allowRescheduling.maxHours && hoursSinceCreation > allowRescheduling.maxHours) {
-    return false;
-  }
-
-  if (allowRescheduling.maxDays && hoursSinceCreation > allowRescheduling.maxDays * 24) {
-    return false;
-  }
-
-  return true;
-}
 
 async function handler(
   req: NextApiRequest & {
@@ -1192,10 +1200,10 @@ async function handler(
 
     if (originalRescheduledBooking) {
       const bookingCreatedAt = dayjs(originalRescheduledBooking.createdAt);
-
-      //Check if rescheduling is allowed based on the event type settings
+    
+      // Check if rescheduling is allowed based on the event type settings
       const allowRescheduling = originalRescheduledBooking.eventType?.allowRescheduling;
-      if (!isReschedulingAllowed(allowRescheduling, bookingCreatedAt)) {
+      if (!isReschedulingAllowed(allowRescheduling, bookingCreatedAt.toDate())) {
         throw new HttpError({ statusCode: 400, message: "Rescheduling is not allowed for this booking" });
       }
     }

@@ -19,6 +19,16 @@ import type { PeriodType } from "@calcom/prisma/enums";
 import type { IntervalLimit } from "@calcom/types/Calendar";
 import { Button, DateRangePicker, InputField, Label, Select, SettingsToggle, TextField } from "@calcom/ui";
 
+type ReschedulingLimitInputProps = {
+  hoursValue: number;
+  daysValue: number;
+  onHoursChange: (value: number) => void;
+  onDaysChange: (value: number) => void;
+  disabled: boolean;
+  hoursLabel: string;
+  daysLabel: string;
+};
+
 const MinimumBookingNoticeInput = React.forwardRef<
   HTMLInputElement,
   Omit<UseFormRegisterReturn<"minimumBookingNotice">, "ref">
@@ -110,7 +120,7 @@ const MinimumBookingNoticeInput = React.forwardRef<
   );
 });
 
-const ReschedulingLimitInput = ({
+const ReschedulingLimitInput: React.FC<ReschedulingLimitInputProps> = ({
   hoursValue,
   daysValue,
   onHoursChange,

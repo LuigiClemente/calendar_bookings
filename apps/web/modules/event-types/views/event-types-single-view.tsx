@@ -504,22 +504,16 @@ const EventTypePage = (props: EventTypeSetupProps) => {
   };
 
   const getDirtyFields = (values: FormValues): Partial<FormValues> => {
-    console.log("Form is dirty:", isFormDirty); // Log form dirty state
     if (!isFormDirty) {
       return {};
     }
     const updatedFields: Partial<FormValues> = {};
     Object.keys(dirtyFields).forEach((key) => {
-      const typedKey = key as keyof typeof dirtyFields;
-      updatedFields[typedKey] = undefined;
-      const isDirty = isFieldDirty(typedKey);
-      if (isDirty) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        updatedFields[typedKey] = values[typedKey];
+      const typedKey = key as keyof FormValues;
+      if (isFieldDirty(typedKey)) {
+        (updatedFields as any)[typedKey] = values[typedKey];
       }
     });
-    console.log("updatedFields", updatedFields);
     return updatedFields;
   };
 

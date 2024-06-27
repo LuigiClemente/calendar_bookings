@@ -475,34 +475,32 @@ export const Booker = (props: BookerProps & WrappedBookerProps) => {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
 
-  console.log("Booker props", props);
-
   useEffect(() => {
-    console.log("Booker session", session);
-    if (path) {
-      if (status === "unauthenticated") {
-        const callbackUrl = searchParams?.get("callbackUrl");
-        if (callbackUrl) {
-          router.replace(decodeURIComponent(callbackUrl));
-        } else {
-          router.push(`/auth/login-new?callbackUrl=${encodeURIComponent(path)}`);
-        }
+    if (status === "unauthenticated") {
+      const callbackUrl = searchParams?.get("callbackUrl");
+      if (callbackUrl) {
+        router.replace(decodeURIComponent(callbackUrl));
+      } else {
+        router.push(`/auth/login-new?callbackUrl=${encodeURIComponent(path || "")}`);
       }
     }
-  }, [status]);
-  console.log("Booker session", session);
-  console.log("Booker status", status);
+  }, [status, path, searchParams, router]);
 
+  // Show loading state while checking session
   if (status === "loading") {
     return <p>Loading...</p>;
   }
 
-  if (session !== null)
-    return (
-      <LazyMotion strict features={loadFramerFeatures}>
-        <BookerComponent {...props} session={session} />
-      </LazyMotion>
-    );
+  // Redirect or show nothing if not authenticated
+  if (status === "unauthenticated") {
+    return null;
+  }
 
-  return null;
+  // At this point, we're sure that status is "authenticated" and session is not null
+  return (
+    <LazyMotion strict features={loadFramerFeatures}>
+      <BookerComponent {...props} session={session!} />
+    </LazyMotion>
+  );
 };
+

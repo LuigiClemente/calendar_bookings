@@ -1,8 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # .env file
-.env
-!packages/prisma/.env
 
 # dependencies
 node_modules
@@ -39,8 +37,6 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-!.env.example
-!.env.appStore.example
 
 # vercel
 .vercel
