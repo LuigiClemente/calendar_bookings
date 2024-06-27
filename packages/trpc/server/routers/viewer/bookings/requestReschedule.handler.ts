@@ -42,6 +42,7 @@ const log = logger.getSubLogger({ prefix: ["requestRescheduleHandler"] });
 export const requestRescheduleHandler = async ({ ctx, input }: RequestRescheduleOptions) => {
   const { user } = ctx;
   const { bookingId, rescheduleReason: cancellationReason } = input;
+
   log.debug("Started", safeStringify({ bookingId, cancellationReason, user }));
   const bookingToReschedule = await prisma.booking.findFirstOrThrow({
     select: {
@@ -75,6 +76,7 @@ export const requestRescheduleHandler = async ({ ctx, input }: RequestReschedule
       workflowReminders: true,
       responses: true,
       iCalUID: true,
+      createdAt: true,
     },
     where: {
       uid: bookingId,

@@ -23,6 +23,8 @@ export const EventAppsTab = ({ eventType }: { eventType: EventType }) => {
     teamId: eventType.team?.id || eventType.parent?.teamId,
   });
 
+  console.log(eventTypeApps)
+
   const formMethods = useFormContext<FormValues>();
   const installedApps =
     eventTypeApps?.items.filter((app) => app.userCredentialIds.length || app.teams.length) || [];
@@ -30,7 +32,12 @@ export const EventAppsTab = ({ eventType }: { eventType: EventType }) => {
     eventTypeApps?.items.filter((app) => !app.userCredentialIds.length && !app.teams.length) || [];
   const allAppsData = formMethods.watch("metadata")?.apps || {};
 
+  console.log(allAppsData)
+  console.log(installedApps)
+  console.log(notInstalledApps)
+
   const setAllAppsData = (_allAppsData: typeof allAppsData) => {
+    console.log(_allAppsData)
     formMethods.setValue(
       "metadata",
       {
@@ -47,6 +54,7 @@ export const EventAppsTab = ({ eventType }: { eventType: EventType }) => {
       if (key) {
         return appData[key as keyof typeof appData];
       }
+      console.log(appData)
       return appData;
     };
   };

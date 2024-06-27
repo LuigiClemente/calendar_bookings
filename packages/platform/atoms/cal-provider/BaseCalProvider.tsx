@@ -62,6 +62,8 @@ export function BaseCalProvider({
     clientId,
   });
 
+  const flattenedTranslations = flattenObject(enTranslations);
+
   return isInit ? (
     <AtomsContext.Provider
       value={{
@@ -75,7 +77,7 @@ export function BaseCalProvider({
         isValidClient: Boolean(!error && clientId && isInit),
         isAuth: Boolean(isInit && !error && clientId && currentAccessToken && http.getAuthorizationHeader()),
         t: (key, values) => {
-          let translation = String(enTranslations[key as translationKeys] ?? "");
+          let translation = String(flattenedTranslations[key as translationKeys] ?? "");
           if (!translation) {
             return "";
           }
@@ -92,13 +94,13 @@ export function BaseCalProvider({
             }
           }
 
-          return replaceOccurrences(translation, enTranslations) ?? "";
+          return replaceOccurrences(translation, flattenedTranslations) ?? "";
         },
         i18n: {
           language: "en",
           defaultLocale: "en",
           locales: ["en"],
-          exists: (key: translationKeys | string) => Boolean(enTranslations[key as translationKeys]),
+          exists: (key: translationKeys | string) => Boolean(flattenedTranslations[key as translationKeys]),
         },
       }}>
       <TooltipProvider>{children}</TooltipProvider>
@@ -121,4 +123,16 @@ function replaceOccurrences(input: string, replacementMap: { [key: string]: stri
     // If the key is not found in the replacement map, you may choose to return the original match
     return match;
   });
+}
+
+function flattenObject(obj: { [key: string]: any }, parentKey = '', result: { [key: string]: string } = {}): { [key: string]: string } {
+  for (let key in obj) {
+    const newKey = parentKey ? `${parentKey}.${key}` : key;
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      flattenObject(obj[key], newKey, result);
+    } else {
+      result[newKey] = obj[key];
+    }
+  }
+  return result;
 }

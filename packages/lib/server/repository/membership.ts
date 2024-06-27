@@ -115,6 +115,8 @@ export class MembershipRepository {
                     user: { select: userSelect },
                   },
                 },
+                allowRescheduling: true,
+                allowCancellation: true,
               },
               // As required by getByViewHandler - Make it configurable
               orderBy: [
