@@ -30,11 +30,7 @@ class MyDocument extends Document<Props> {
 
     const getLocaleModule = ctx.req ? await import("@calcom/features/auth/lib/getLocale") : null;
 
-    const newLocale =
-      ctx.req && getLocaleModule
-        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await getLocaleModule.getLocale(ctx.req as IncomingMessage & { cookies: Record<string, any> })
-        : "en";
+    const newLocale ='fr';
 
     const asPath = ctx.asPath || "";
     // Use a dummy URL as default so that URL parsing works for relative URLs as well. We care about searchParams and pathname only

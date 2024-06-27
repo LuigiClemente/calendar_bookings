@@ -19,6 +19,36 @@
   font-family: 'CeraPro-Regular', sans-serif !important;
 
   /* background */
+  --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+ 
+    --card: 0 0% 100%; 
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
   --cal-bg-emphasis: hsla(220, 13%, 91%, 1);
   --cal-bg: hsla(0, 0%, 100%, 1);
   --cal-bg-subtle: hsla(220, 14%, 96%, 1);
@@ -124,9 +154,14 @@
   background: var(--cal-brand);
 }
 
+html {
+  width : 100vw;
+  overflow-x : hidden;
+}
 body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  
 }
 
 /*
@@ -492,4 +527,10 @@ select:focus {
 
 .react-tel-input .flag-dropdown {
   @apply !border-r-default left-0.5 !border-y-0 !border-l-0;
+}
+.text-muted-foreground {
+  color : #64748b;
+}
+.bg-muted {
+  background : #f1f5f9;
 }

@@ -1,6 +1,3 @@
-"use client";
-
-// PageLogin.js
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
@@ -8,6 +5,9 @@ import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import PageWrapper from "@components/PageWrapper";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 
@@ -27,70 +27,82 @@ const loginSchema = z.object({
 });
 
 let codeRun = false;
-const PageLogin = ({ languagesData }: inferSSRProps<typeof getServerSideProps> & WithNonceProps<{}>) => {
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+const PageLogin: React.FC<inferSSRProps<typeof getServerSideProps> & WithNonceProps<Record<string, unknown>>> = ({ languagesData, csrfToken }) => {
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [preferredLangData, setPrefferedLanguageData] = useState(languagesData[selectedLanguage]);
 
   function t(str: string) {
     const splitArr = str.split(".");
 
     if (splitArr[1]) {
-      return preferredLangData[splitArr[0]][splitArr[1]];
+      return preferredLangData[splitArr[0]][splitArr[1]]
     } else {
-      return preferredLangData[splitArr[0]];
+      return preferredLangData[splitArr[0]]
     }
   }
+
   useEffect(() => {
     if (typeof window !== undefined) {
-      const locale = window.localStorage.getItem("waleed-intl-locale");
+      const locale = window.localStorage.getItem('waleed-intl-locale');
       if (locale) {
         setPrefferedLanguageData(languagesData[locale]);
         setSelectedLanguage(locale);
       } else {
-        window.localStorage.getItem("en");
+        window.localStorage.getItem('en')
       }
     }
   }, [languagesData]);
+
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
 
   const changeLanguage = (locale: string) => {
-    window.localStorage.setItem("waleed-intl-locale", locale);
+    window.localStorage.setItem('waleed-intl-locale', locale);
     setPrefferedLanguageData(languagesData[locale]);
-
     setSelectedLanguage(locale);
-    console.log({ locale });
-    console.log({ selectedLanguage });
+  }
+
+  const onSubmit = async (data: any) => {
+    // Integrate the login logic here
+    const res = await signIn<"credentials">("credentials", {
+      ...data,
+      csrfToken,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      // Handle login error
+      console.log("Login error:", res.error);
+    } else {
+      // Redirect on successful login
+      router.push("/");
+    }
   };
 
-  const onSubmit = (data: any) => {
-    // Handle your login logic here
-    console.log("Form submitted:", data);
-  };
   const [langBtnState, setLangBtnState] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [navOpen, setNavOpen] = useState<boolean>(false);
   const [isLangBtnHovered, setIsLangBtnHovered] = useState(false);
 
   const [langOpen, setLangOpen] = useState<boolean>(false);
-
   const [welcomeBack, setWelcomeBack] = useState(false);
 
   useEffect(() => {
     if (!codeRun) {
       codeRun = true;
-      console.log("Code run Code run");
+      console.log('Code run Code run')
       if (typeof window !== "undefined") {
-        const isReturningUser = window.localStorage.getItem("hasVisitedBefore2");
-        console.log({ isReturningUser });
+        const isReturningUser = window.localStorage.getItem('hasVisitedBefore2');
+        console.log({ isReturningUser })
         setWelcomeBack(!!isReturningUser); // Cast the string to a boolean
         if (!isReturningUser) {
-          window.localStorage.setItem("hasVisitedBefore2", "true");
+          window.localStorage.setItem('hasVisitedBefore2', 'true');
         }
       }
     }
@@ -117,14 +129,15 @@ const PageLogin = ({ languagesData }: inferSSRProps<typeof getServerSideProps> &
         <div className="w-full rounded-lg bg-white shadow dark:border dark:border-gray-700 dark:bg-gray-800 sm:max-w-md md:mt-0 xl:p-0">
           <div className="space-y-4 p-6 sm:p-8 md:space-y-6">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-2xl">
-              {welcomeBack ? t("welcomeBack") : t("welcome")}
+              {welcomeBack ? t('welcomeBack') : t('welcome')}
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <input type="hidden" value={csrfToken || ""} {...register("csrfToken")} />
               <div>
                 <label
                   htmlFor="email"
                   className="mb-2 block text-sm font-light text-gray-900 dark:text-white">
-                  {t("welcomeOrWelcomeBackPage.yourEmail")}
+                  {t('welcomeOrWelcomeBackPage.yourEmail')}
                 </label>
                 <input
                   {...register("email")}
@@ -142,7 +155,7 @@ const PageLogin = ({ languagesData }: inferSSRProps<typeof getServerSideProps> &
                 <label
                   htmlFor="password"
                   className="mb-2 block text-sm font-light text-gray-900 dark:text-white">
-                  {t("welcomeOrWelcomeBackPage.password")}
+                  {t('welcomeOrWelcomeBackPage.password')}
                 </label>
                 <input
                   {...register("password")}
@@ -158,7 +171,6 @@ const PageLogin = ({ languagesData }: inferSSRProps<typeof getServerSideProps> &
 
               <div className="flex items-center justify-between">
                 <div />
-
                 <Link
                   href="/auth/forgot-password2"
                   tabIndex={-1}
@@ -167,18 +179,9 @@ const PageLogin = ({ languagesData }: inferSSRProps<typeof getServerSideProps> &
                 </Link>
               </div>
 
-              <button type="submit" className="btn-primary w-full bg-[#2ae8d3] ">
-                {t("welcomeOrWelcomeBackPage.signIn")}
+              <button type="submit" className="btn-primary w-full bg-[#2ae8d3]" disabled={isSubmitting}>
+                {t('welcomeOrWelcomeBackPage.signIn')}
               </button>
-              {/* <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don’t have an account yet?{' '}
-                <a
-                  href="#"
-                  className="font-medium text-black hover:underline dark:text-black"
-                >
-                  Sign up
-                </a>
-              </p> */}
             </form>
           </div>
         </div>

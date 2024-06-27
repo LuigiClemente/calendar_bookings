@@ -2301,5 +2301,20 @@
   "confirm_email": "Confirme o seu e-mail",
   "confirm_email_description": "Enviámos um e-mail para <strong>{{email}}</strong>. Clique na ligação nesse e-mail para verificar este endereço.",
   "send_event_details_to": "Enviar detalhes do evento para",
-  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Add your new strings above here ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑"
+  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Add your new strings above here ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+  "Resources": "Recursos",
+  "Store": "Loja",
+  "Plans": "Planos",
+  "Appointments": "Compromissos",
+  "Payments": "Pagamentos",
+  "Documents": "Documentos",
+  "Personal": "Pessoal",
+  "Sign out": "Sair",
+  "Blog": "Blog",
+  "Latest": "Último",
+  "description_heading": "Um blog criado com Next.js e Tailwind.css",
+  "search_prompt": "Digite um comando ou procure.....",
+  "Content": "Conteúdo",
+  "Search": "Pesquisar",
+   "Teams": "Equipes"
 }

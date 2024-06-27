@@ -2299,5 +2299,20 @@
   "confirm_email": "Bestätigen Sie Ihre E-Mail-Adresse",
   "confirm_email_description": "Wir haben eine E-Mail an <strong>{{email}}</strong> gesendet. Klicken Sie auf den Link in der E-Mail, um diese Adresse zu bestätigen.",
   "send_event_details_to": "Termindetails senden an",
-  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Fügen Sie Ihre neuen Code-Zeilen über dieser hinzu ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑"
+  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Fügen Sie Ihre neuen Code-Zeilen über dieser hinzu ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+  "Resources": "Ressourcen",
+  "Store": "Shop",
+  "Plans": "Pläne",
+  "Appointments": "Termine",
+  "Payments": "Zahlungen",
+  "Documents": "Dokumente",
+  "Personal": "Persönlich",
+  "Sign out": "Abmelden",
+  "Blog": "Blog",
+  "Latest": "Neueste",
+  "description_heading": "Ein Blog erstellt mit Next.js und Tailwind.css",
+  "search_prompt": "Geben Sie einen Befehl ein oder suchen Sie.....",
+  "Content": "Inhalt",
+    "Search": "Suchen",
+     "Teams": "Teams"
 }

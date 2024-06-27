@@ -244,121 +244,96 @@ const providers: Provider[] = [
   ImpersonationProvider,
 ];
 
-providers.push(
-  CredentialsProvider({
-    id: "keycloak",
-    name: "Keycloak Login",
-    credentials: {
-      email: { label: "Email", type: "text" },
-      password: { label: "Password", type: "password" },
-    },
+// providers.push(
+//   {
+//     id: "keycloak",
+//     name: "Keycloak Login",
+//     credentials: {
+//       email: { label: "Email", type: "text" },
+//       password: { label: "Password", type: "password" },
+//     },
+//     async authorize(credentials) {
+//       if (!credentials) {
+//         return null;
+//       }
 
-    async authorize(
-      credentials: Record<string, string> | undefined
-    ): Promise<User | null> {
-      console.log("credentials", credentials);
-      if (!credentials) {
-        return null;
-      }
+//       const { email, password } = credentials;
 
-      const { email, password } = credentials;
+//       if (!email || !password) {
+//         return null;
+//       }
 
-      if (!email || !password) {
-        return null;
-      }
+//       // Fetch access token from Keycloak
+//       try {
+//         const response = await axios.post(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/token`,
+//           qs.stringify({
+//             grant_type: 'password',
+//             client_id: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_ID,
+//             client_secret: process.env.NEXT_PRIVATE_KEYCLOAK_CLIENT_SECRET,
+//             username: email,
+//             password: password,
+//             scope: 'openid',
+//           }), {
+//           headers: {
+//             'Content-Type': 'application/x-www-form-urlencoded',
+//           },
+//         });
 
-      try {
-        const response = await axios.post<{
-          access_token: string;
-          refresh_token: string;
-          expires_in: number;
-          refresh_expires_in: number;
-        }>(
-          `http://49.13.193.45:9080/realms/master/protocol/openid-connect/token`,
-          qs.stringify({
-            grant_type: "password",
-            client_id: "documenso",
-            client_secret: "xCzTJZxNeOGEuDFbzp2e4JEnKo3fxJaC",
-            username: email,
-            password: password,
-            scope: "openid",
-          }),
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        );
+//         const data = response.data;
 
-        console.log(response.data);
+//         if (data.access_token) {
+//           const userInfoResponse = await axios.get(`${process.env.NEXT_PRIVATE_APISIX_URL}/realms/master/protocol/openid-connect/userinfo`, {
+//             headers: {
+//               Authorization: `Bearer ${data.access_token}`,
+//             },
+//           });
 
-        const { access_token } = response.data;
+//           const userInfo = userInfoResponse.data;
 
-        if (access_token) {
-          const userInfoResponse = await axios.get<{
-            sub: string;
-            given_name: string;
-            family_name: string;
-            email: string;
-          }>(`http://49.13.193.45:9080/realms/master/protocol/openid-connect/userinfo`, {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-          });
+//           if (!userInfo) {
+//             return null;
+//           }
 
-          console.log(userInfoResponse.data);
+//           const { sub, given_name, family_name, email: userEmail } = userInfo;
+//           let user = !userEmail
+//             ? undefined
+//             : await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
 
-          const { sub, given_name, family_name, email: userEmail } = userInfoResponse.data;
+//           if (!user) {
+//             const hostedCal = Boolean(HOSTED_CAL_FEATURES);
+//             if (hostedCal && userEmail) {
+//               const domain = getDomainFromEmail(userEmail);
+//               const organizationId = await getVerifiedOrganizationByAutoAcceptEmailDomain(domain);
+//               if (organizationId) {
+//                 const createUsersAndConnectToOrgProps = {
+//                   emailsToCreate: [userEmail],
+//                   organizationId,
+//                   identityProvider: IdentityProvider.OIDC,
+//                   identityProviderId: userEmail,
+//                 };
+//                 await createUsersAndConnectToOrg(createUsersAndConnectToOrgProps);
+//                 user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({
+//                   email: userEmail,
+//                 });
+//               }
+//             }
+//             if (!user) throw new Error(ErrorCode.UserNotFound);
+//           }
 
-          let user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
-
-          if (!user) {
-            const tempUser = await prisma.user.create({
-              data: {
-                email: userEmail,
-                name: `${given_name} ${family_name}`,
-                username: usernameSlug(`${given_name} ${family_name}`),
-                emailVerified: new Date(),
-                identityProvider: IdentityProvider.KEYCLOAK,
-                identityProviderId: sub,
-              },
-            });
-
-            console.log("User Created", tempUser);
-
-            if (!tempUser) {
-              throw new Error(ErrorCode.UserNotFound);
-            }
-
-            user = await UserRepository.findByEmailAndIncludeProfilesAndPassword({ email: userEmail });
-
-            if (!user) {
-              throw new Error(ErrorCode.UserNotFound);
-            }
-          }
-
-          const hasActiveTeams = checkIfUserBelongsToActiveTeam(user);
-
-          // Remove the validateRole function as it's not needed for Keycloak authentication
-
-          return {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            belongsToActiveTeam: hasActiveTeams,
-            locale: user.locale,
-            profile: user.allProfiles[0],
-          } as User;
-        }
-      } catch (error) {
-        console.error("Keycloak authentication error:", error);
-        return null;
-      }
-      return null
-    },
-  }));
+//           const [userProfile] = user?.allProfiles;
+//           return {
+//             id: sub,
+//             firstName: given_name,
+//             lastName: family_name,
+//             email: userEmail,
+//             name: `${given_name} ${family_name}`.trim(),
+//             email_verified: true,
+//             profile: userProfile,
+//           };
+//         },
+//         type: "credentials"
+//       }
+// )
 
 if (IS_GOOGLE_LOGIN_ENABLED) {
   providers.push(
