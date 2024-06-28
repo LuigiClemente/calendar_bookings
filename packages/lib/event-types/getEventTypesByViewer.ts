@@ -61,24 +61,24 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
     ),
     shouldListUserEvents
       ? EventTypeRepository.findAllByUpId(
-        {
-          upId: userProfile.upId,
-          userId: user.id,
-        },
-        {
-          where: {
-            teamId: null,
+          {
+            upId: userProfile.upId,
+            userId: user.id,
           },
-          orderBy: [
-            {
-              position: "desc",
+          {
+            where: {
+              teamId: null,
             },
-            {
-              id: "asc",
-            },
-          ],
-        }
-      )
+            orderBy: [
+              {
+                position: "desc",
+              },
+              {
+                id: "asc",
+              },
+            ],
+          }
+        )
       : [],
   ]);
 
@@ -263,11 +263,17 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
 
           console.log(JSON.stringify(team.eventTypes[0], null, 2));
 
-          const eventTypes = await Promise.all(team.eventTypes.map((et): UserEventTypes => ({
-            ...et,
-            allowRescheduling: et.allowRescheduling,
-            allowCancellation: et.allowCancellation,
-          })).map(mapEventType));
+          const eventTypes = await Promise.all(
+            team.eventTypes
+              .map(
+                (et): UserEventTypes => ({
+                  ...et,
+                  allowRescheduling: et.allowRescheduling,
+                  allowCancellation: et.allowCancellation,
+                })
+              )
+              .map(mapEventType)
+          );
 
           const teamParentMetadata = team.parent ? teamMetadataSchema.parse(team.parent.metadata) : null;
           return {
@@ -281,16 +287,16 @@ export const getEventTypesByViewer = async (user: User, filters?: Filters, forRo
             profile: {
               image: team.parentId
                 ? getOrgAvatarUrl({
-                  slug: team.parent?.slug || null,
-                  logoUrl: team.parent?.logoUrl,
-                  requestedSlug: team.slug,
-                })
+                    slug: team.parent?.slug || null,
+                    logoUrl: team.parent?.logoUrl,
+                    requestedSlug: team.slug,
+                  })
                 : getTeamAvatarUrl({
-                  slug: team.slug,
-                  logoUrl: team.logoUrl,
-                  requestedSlug: team.metadata?.requestedSlug ?? null,
-                  organizationId: team.parentId,
-                }),
+                    slug: team.slug,
+                    logoUrl: team.logoUrl,
+                    requestedSlug: team.metadata?.requestedSlug ?? null,
+                    organizationId: team.parentId,
+                  }),
               name: team.name,
               slug,
             },

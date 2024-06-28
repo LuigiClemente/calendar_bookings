@@ -125,10 +125,14 @@ function replaceOccurrences(input: string, replacementMap: { [key: string]: stri
   });
 }
 
-function flattenObject(obj: { [key: string]: any }, parentKey = '', result: { [key: string]: string } = {}): { [key: string]: string } {
+function flattenObject(
+  obj: { [key: string]: any },
+  parentKey = "",
+  result: { [key: string]: string } = {}
+): { [key: string]: string } {
   for (let key in obj) {
     const newKey = parentKey ? `${parentKey}.${key}` : key;
-    if (typeof obj[key] === 'object' && obj[key] !== null) {
+    if (typeof obj[key] === "object" && obj[key] !== null) {
       flattenObject(obj[key], newKey, result);
     } else {
       result[newKey] = obj[key];

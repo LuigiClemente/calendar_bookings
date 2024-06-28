@@ -1,3 +1,4 @@
+import type { Session } from "next-auth";
 import type { TFunction } from "next-i18next";
 import { Trans } from "next-i18next";
 import Link from "next/link";
@@ -15,7 +16,6 @@ import type { UseBookingFormReturnType } from "../hooks/useBookingForm";
 import type { IUseBookingErrors, IUseBookingLoadingStates } from "../hooks/useBookings";
 import { BookingFields } from "./BookingFields";
 import { FormSkeleton } from "./Skeleton";
-import type { Session } from "next-auth";
 
 type BookEventFormProps = {
   onCancel?: () => void;
@@ -49,7 +49,6 @@ export const BookEventForm = ({
   eventQuery: useEventReturnType;
   rescheduleUid: string | null;
 }) => {
-
   const eventType = eventQuery.data;
   const setFormValues = useBookerStore((state) => state.setFormValues);
   const bookingData = useBookerStore((state) => state.bookingData);
@@ -94,8 +93,6 @@ export const BookEventForm = ({
     console.warn("No event type found for event", extraOptions);
     return <Alert severity="warning" message={t("error_booking_event")} />;
   }
-
-
 
   return (
     <div className="flex h-full flex-col">
@@ -166,10 +163,10 @@ export const BookEventForm = ({
                 {rescheduleUid && bookingData
                   ? t("reschedule")
                   : renderConfirmNotVerifyEmailButtonCond
-                    ? isPaidEvent
-                      ? t("pay_and_book")
-                      : t("confirm")
-                    : t("verify_email_email_button")}
+                  ? isPaidEvent
+                    ? t("pay_and_book")
+                    : t("confirm")
+                  : t("verify_email_email_button")}
               </Button>
             </>
           )}

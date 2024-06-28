@@ -1,4 +1,18 @@
 {
+
+  "allow_rescheduling": "Permettre le Replanning",
+  "allow_rescheduling_description": "Limiter la période future dans laquelle cet événement peut être replanifié",
+  "max_rescheduling_hours": "Heures Maximales de Replanning",
+  "max_rescheduling_days": "Jours Maximaux de Replanning",
+  "no_rescheduling_limit": "Aucune Limite de Replanning",
+  "allow_cancellation": "Permettre l'Annulation",
+  "allow_cancellation_description": "Limiter la période future dans laquelle cet événement peut être annulé",
+  "max_cancellation_hours": "Heures Maximales d'Annulation",
+  "max_cancellation_days": "Jours Maximaux d'Annulation",
+  "no_cancellation_limit": "Aucune Limite d'Annulation",
+  "cancellation_not_allowed": "L'annulation n'est pas autorisée pour cette réservation",
+  "rescheduling_not_allowed": "Le replanning n'est pas autorisé pour cette réservation"
+
 "welcomeBack": "Bienvenue de nouveau",
 "forgotPassword": "Mot de passe oublié",
 "forgetPasswordPage": {

@@ -503,4 +503,3 @@ export const Booker = (props: BookerProps & WrappedBookerProps) => {
     </LazyMotion>
   );
 };
-

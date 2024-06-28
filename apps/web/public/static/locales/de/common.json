@@ -1,4 +1,17 @@
 {
+
+ "allow_rescheduling": "Umschulung Erlauben",
+  "allow_rescheduling_description": "Begrenzen Sie, wie weit in der Zukunft dieses Ereignis umgeplant werden kann",
+  "max_rescheduling_hours": "Maximale Umschulungsstunden",
+  "max_rescheduling_days": "Maximale Umschulungstage",
+  "no_rescheduling_limit": "Keine Umschulungsbegrenzung",
+  "allow_cancellation": "Stornierung Erlauben",
+  "allow_cancellation_description": "Begrenzen Sie, wie weit in der Zukunft dieses Ereignis storniert werden kann",
+  "max_cancellation_hours": "Maximale Stornierungsstunden",
+  "max_cancellation_days": "Maximale Stornierungstage",
+  "no_cancellation_limit": "Keine Stornierungsbegrenzung",
+  "cancellation_not_allowed": "Stornierung ist für diese Buchung nicht erlaubt",
+  "rescheduling_not_allowed": "Umschulung ist für diese Buchung nicht erlaubt",
   
 "welcomeBack": "Willkommen zurück",
 "forgotPassword": "Passwort vergessen",

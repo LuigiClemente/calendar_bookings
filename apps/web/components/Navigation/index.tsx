@@ -1,23 +1,34 @@
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { CiGlobe } from "react-icons/ci";
 import { Popover } from "react-tiny-popover";
 
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import { trpc } from "@calcom/trpc/react";
-import { showToast } from "@calcom/ui";
 
 import { IMAGE_URL } from "@lib/image_url";
 import { languages } from "@lib/languages";
-import type { LocalActiveType } from "@lib/routes";
-import { routes } from "@lib/routes";
+import { routes, LocalActiveType } from "@lib/routes";
 
 import "./navigation.css";
 
-export const Navigation = ({
+// Define prop types for better type checking
+interface NavigationProps {
+  navOpen: boolean;
+  langOpen: boolean;
+  setLangOpen: (open: boolean) => void;
+  setNavOpen: (open: boolean) => void;
+  isHovered: boolean;
+  setIsHovered: (hovered: boolean) => void;
+  isLangBtnHovered: boolean;
+  setIsLangBtnHovered: (hovered: boolean) => void;
+  changeLanguage: (lang: LocalActiveType) => void;
+  languageData: any; // Consider defining a more specific type if possible
+  selectedLanguage: LocalActiveType;
+}
+
+export const Navigation: React.FC<NavigationProps> = ({
   navOpen,
   langOpen,
   setLangOpen,
@@ -29,30 +40,18 @@ export const Navigation = ({
   changeLanguage,
   languageData,
   selectedLanguage,
-}: {
-  navOpen: boolean;
-  langOpen: boolean;
-  setLangOpen: any;
-  setNavOpen: any;
-  isHovered: any;
-  setIsHovered: any;
-  setIsLangBtnHovered: any;
-  isLangBtnHovered: any;
-  changeLanguage: any;
-  languageData: any;
-  selectedLanguage: any;
 }) => {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-  const pathname = usePathname();
-  const { t, i18n } = useLocale();
+  const { t } = useLocale();
   const [langBtnState, setLangBtnState] = useState(false);
+
+  const getRoute = (key: keyof (typeof routes)[LocalActiveType]): string => {
+    return routes[selectedLanguage][key] || "/";
+  };
 
   return (
     <nav className="dark mx-auto flex w-full items-center justify-between pr-[10px]">
       <div className="relative font-extrabold text-black">
         <Image
-          loader={({ src }) => src}
           alt="logo"
           height={70}
           width={120}
@@ -69,7 +68,7 @@ export const Navigation = ({
           positions={["left", "top"]}
           padding={10}
           onClickOutside={() => setLangOpen(false)}
-          content={({ position, nudgedLeft, nudgedTop }) => (
+          content={() => (
             <div className="languages-box">
               {languages.map((lang) => (
                 <div
@@ -93,13 +92,8 @@ export const Navigation = ({
               onMouseEnter={() => setIsLangBtnHovered(true)}
               onMouseLeave={() => setIsLangBtnHovered(false)}
               onClick={() => {
-                if (!langBtnState) {
-                  setLangBtnState(true);
-                  setLangOpen(true);
-                } else {
-                  setLangBtnState(false);
-                  setLangOpen(false);
-                }
+                setLangBtnState(!langBtnState);
+                setLangOpen(!langOpen);
               }}
             />
             <CiGlobe color="#000000" />
@@ -119,7 +113,13 @@ export const Navigation = ({
         </div>
 
         <div className={classNames("navigation", "dark")}>
-          <input type="checkbox" className="navigation__checkbox" checked={navOpen} id="navi-toggle" />
+          <input
+            type="checkbox"
+            className="navigation__checkbox"
+            checked={navOpen}
+            id="navi-toggle"
+            readOnly
+          />
           <div className={`navigation__background ${navOpen ? "navOpen" : ""}`}>&nbsp;</div>
           <nav className="navigation__nav">
             <div className="custom-container flex min-h-[130px] items-center justify-between">
@@ -138,22 +138,24 @@ export const Navigation = ({
               </div>
             </div>
             <ul className="navigation__list flex flex-col">
-              <Link href={routes[selectedLanguage]["home"]} className="navigation__item inline-block">
+              <Link href={getRoute("home")} className="navigation__item inline-block">
                 <span className="navigation__link">{t("Home")}</span>
               </Link>
-              <Link href={routes[selectedLanguage]["about-us"]} className="navigation__item inline-block">
+              <Link href={getRoute("about-us")} className="navigation__item inline-block">
                 <span className="navigation__link">{t("About_Us")}</span>
               </Link>
-              <Link href={routes[selectedLanguage]["our-studies"]} className="navigation__item inline-block">
+              <Link href={getRoute("our-studies")} className="navigation__item inline-block">
                 <span className="navigation__link">{t("Our_Studies")}</span>
               </Link>
-              <Link href={routes[selectedLanguage]["terms-of-use"]} className="navigation__item inline-block">
+              <Link href={getRoute("terms-of-use")} className="navigation__item inline-block">
                 <span className="navigation__link">{t("Terms_of_Service")}</span>
               </Link>
-              <Link href={routes[selectedLanguage]["cookies"]} className="navigation__item inline-block">
-                <span className="navigation__link">{t("Cookies_Policy")}</span>
-              </Link>
-              <Link href={routes[selectedLanguage]["privacy"]} className="navigation__item inline-block">
+              {routes[selectedLanguage].cookies && (
+                <Link href={getRoute("cookies")} className="navigation__item inline-block">
+                  <span className="navigation__link">{t("Cookies_Policy")}</span>
+                </Link>
+              )}
+              <Link href={getRoute("privacy")} className="navigation__item inline-block">
                 <span className="navigation__link">{t("Privacy_Policy")}</span>
               </Link>
             </ul>

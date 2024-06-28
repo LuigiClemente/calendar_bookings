@@ -200,7 +200,7 @@ const SettingsSidebarContainer = ({
   navigationIsOpenedOnMobile,
   bannersHeight,
 }: SettingsSidebarContainerProps) => {
-  console.log({navigationIsOpenedOnMobile})
+  console.log({ navigationIsOpenedOnMobile });
   const searchParams = useCompatSearchParams();
   const { t } = useLocale();
   const tabsWithPermissions = useTabs();
@@ -274,15 +274,16 @@ const SettingsSidebarContainer = ({
     <nav
       style={{ maxHeight: `calc(100vh - ${bannersHeight}px)`, top: `${bannersHeight}px` }}
       className={classNames(
-        navigationIsOpenedOnMobile ? " bg-muted fixed bottom-0 left-0 top-0 z-20 flex max-h-screen w-56 flex-col space-y-1 overflow-x-hidden overflow-y-scroll px-2 pb-3 transition-transform max-lg:z-10 lg:sticky lg:flex" : " bg-muted  bottom-0 left-0 top-0 z-20 flex  w-56 flex-col space-y-1  px-2 pb-3 transition-transform max-lg:z-10  lg:flex  ",
+        navigationIsOpenedOnMobile
+          ? " bg-muted fixed bottom-0 left-0 top-0 z-20 flex max-h-screen w-56 flex-col space-y-1 overflow-x-hidden overflow-y-scroll px-2 pb-3 transition-transform max-lg:z-10 lg:sticky lg:flex"
+          : " bg-muted  bottom-0 left-0 top-0 z-20 flex  w-56 flex-col space-y-1  px-2 pb-3 transition-transform max-lg:z-10  lg:flex  ",
         className,
         navigationIsOpenedOnMobile
           ? "translate-x-0 opacity-100"
-          : "-translate-x-full opacity-0 lg:translate-x-0 lg:opacity-100"
+          : "-translate-x-full opacity-0 lg:translate-x-0 lg:opacity-100",
 
-          ,
-          navigationIsOpenedOnMobile ? "w-auto" :"w-[0px]",
-          "lg:w-auto"
+        navigationIsOpenedOnMobile ? "w-auto" : "w-[0px]",
+        "lg:w-auto"
       )}
       aria-label="Tabs">
       <>
@@ -300,7 +301,7 @@ const SettingsSidebarContainer = ({
                           className="h-[16px] w-[16px] stroke-[2px] ltr:mr-3 rtl:ml-3 md:mt-0"
                         />
                       )}
-                      
+
                       <Skeleton
                         title={tab.name}
                         as="p"
@@ -575,7 +576,11 @@ const SettingsSidebarContainer = ({
   );
 };
 
-const MobileSettingsContainer = (props: {sideContainerOpen :any, setSideContainerOpen:any, onSideContainerOpen?: () => void }) => {
+const MobileSettingsContainer = (props: {
+  sideContainerOpen: any;
+  setSideContainerOpen: any;
+  onSideContainerOpen?: () => void;
+}) => {
   const { t } = useLocale();
   const router = useRouter();
 
@@ -583,11 +588,9 @@ const MobileSettingsContainer = (props: {sideContainerOpen :any, setSideContaine
     <>
       <nav className="  lg:hidden">
         <div className=" ">
-          <Button  color="minimal" variant="icon" onClick={props.onSideContainerOpen}>
-          Open Tabs
-         
+          <Button color="minimal" variant="icon" onClick={props.onSideContainerOpen}>
+            Open Tabs
           </Button>
-
         </div>
       </nav>
     </>
@@ -628,21 +631,22 @@ export default function SettingsLayout({
       flexChildrenContainer
       hideHeadingOnMobile
       {...rest}
-    
       drawerState={state}
-      MobileNavigationContainer={null}
-      >
+      MobileNavigationContainer={null}>
       <div className="flex">
-        
-
-      <SidebarContainerElement
+        <SidebarContainerElement
           sideContainerOpen={sideContainerOpen}
           setSideContainerOpen={setSideContainerOpen}
-          />
-      
-        <div className="grow mx-auto max-w-full justify-center lg:max-w-3xl">
-            <MobileSettingsContainer  sideContainerOpen={sideContainerOpen}
-          setSideContainerOpen={setSideContainerOpen} onSideContainerOpen={() => {console.log({sideContainerOpen});setSideContainerOpen(!sideContainerOpen)}} ></MobileSettingsContainer>
+        />
+
+        <div className="mx-auto max-w-full grow justify-center lg:max-w-3xl">
+          <MobileSettingsContainer
+            sideContainerOpen={sideContainerOpen}
+            setSideContainerOpen={setSideContainerOpen}
+            onSideContainerOpen={() => {
+              console.log({ sideContainerOpen });
+              setSideContainerOpen(!sideContainerOpen);
+            }}></MobileSettingsContainer>
           <ShellHeader />
           <ErrorBoundary>
             <Suspense fallback={<Icon name="loader" />}>{children}</Suspense>

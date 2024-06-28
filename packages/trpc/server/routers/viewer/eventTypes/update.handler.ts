@@ -450,8 +450,6 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     console.log("updatedEventTypeSelect", updatedEventTypeSelect);
     //filter if allowRescheduling or allowCancellation is undefined
 
-
-
     updatedEventType = await ctx.prisma.eventType.update({
       where: { id },
       data,

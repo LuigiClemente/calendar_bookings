@@ -1,4 +1,18 @@
 {
+
+  "allow_rescheduling": "Herplannen Toestaan",
+  "allow_rescheduling_description": "Beperk hoe ver in de toekomst dit evenement kan worden herplanned",
+  "max_rescheduling_hours": "Maximale Herplanting Uren",
+  "max_rescheduling_days": "Maximale Herplanting Dagen",
+  "no_rescheduling_limit": "Geen Limiet Voor Herplannen",
+  "allow_cancellation": "Annuleren Toestaan",
+  "allow_cancellation_description": "Beperk hoe ver in de toekomst dit evenement kan worden geannuleerd",
+  "max_cancellation_hours": "Maximale Annuleringsuren",
+  "max_cancellation_days": "Maximale Annuleringsdagen",
+  "no_cancellation_limit": "Geen Annuleringslimiet",
+  "cancellation_not_allowed": "Annuleren is niet toegestaan voor deze boeking",
+  "rescheduling_not_allowed": "Herplannen is niet toegestaan voor deze boeking",
+
   "Home": "Home",
 "About_Us": "Over Ons",
 "Our_Studies": "Onze Studies",

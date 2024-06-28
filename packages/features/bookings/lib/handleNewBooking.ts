@@ -335,9 +335,9 @@ export async function ensureAvailableUsers(
   const duration = dayjs(input.dateTo).diff(input.dateFrom, "minute");
   const originalBookingDuration = input.originalRescheduledBooking
     ? dayjs(input.originalRescheduledBooking.endTime).diff(
-      dayjs(input.originalRescheduledBooking.startTime),
-      "minutes"
-    )
+        dayjs(input.originalRescheduledBooking.startTime),
+        "minutes"
+      )
     : undefined;
 
   const bookingLimits = parseBookingLimit(eventType?.bookingLimits);
@@ -494,9 +494,9 @@ async function getOriginalRescheduledBooking(uid: string, seatsEventType?: boole
       eventType: {
         select: {
           allowRescheduling: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 }
 
@@ -616,10 +616,10 @@ async function createBooking({
   const eventTypeRel = !eventTypeId
     ? {}
     : {
-      connect: {
-        id: eventTypeId,
-      },
-    };
+        connect: {
+          id: eventTypeId,
+        },
+      };
 
   const dynamicEventSlugRef = !eventTypeId ? eventTypeSlug : null;
   const dynamicGroupSlugRef = !eventTypeId ? (reqBodyUser as string).toLowerCase() : null;
@@ -676,8 +676,8 @@ async function createBooking({
     destinationCalendar:
       evt.destinationCalendar && evt.destinationCalendar.length > 0
         ? {
-          connect: { id: evt.destinationCalendar[0].id },
-        }
+            connect: { id: evt.destinationCalendar[0].id },
+          }
         : undefined,
   };
 
@@ -908,38 +908,41 @@ type BookingDataSchemaGetter =
   | typeof getBookingDataSchema
   | typeof import("@calcom/features/bookings/lib/getBookingDataSchemaForApi").default;
 
-  function isReschedulingAllowed(
-    allowRescheduling: {
-      id: number;
-      enabled: boolean;
-      maxHours: number | null;
-      maxDays: number | null;
-      noLimit: boolean;
-    } | null | undefined,
-    originalBookingCreatedTime: Date
-  ): boolean {
-    if (!allowRescheduling || !allowRescheduling.enabled) {
-      return false;
-    }
-  
-    if (allowRescheduling.noLimit) {
-      return true;
-    }
-  
-    const now = dayjs();
-    const bookingCreatedAt = dayjs(originalBookingCreatedTime);
-    const hoursSinceCreation = now.diff(bookingCreatedAt, 'hour');
-  
-    if (allowRescheduling.maxHours !== null && hoursSinceCreation > allowRescheduling.maxHours) {
-      return false;
-    }
-  
-    if (allowRescheduling.maxDays !== null && hoursSinceCreation > allowRescheduling.maxDays * 24) {
-      return false;
-    }
-  
+function isReschedulingAllowed(
+  allowRescheduling:
+    | {
+        id: number;
+        enabled: boolean;
+        maxHours: number | null;
+        maxDays: number | null;
+        noLimit: boolean;
+      }
+    | null
+    | undefined,
+  originalBookingCreatedTime: Date
+): boolean {
+  if (!allowRescheduling || !allowRescheduling.enabled) {
+    return false;
+  }
+
+  if (allowRescheduling.noLimit) {
     return true;
   }
+
+  const now = dayjs();
+  const bookingCreatedAt = dayjs(originalBookingCreatedTime);
+  const hoursSinceCreation = now.diff(bookingCreatedAt, "hour");
+
+  if (allowRescheduling.maxHours !== null && hoursSinceCreation > allowRescheduling.maxHours) {
+    return false;
+  }
+
+  if (allowRescheduling.maxDays !== null && hoursSinceCreation > allowRescheduling.maxDays * 24) {
+    return false;
+  }
+
+  return true;
+}
 
 async function handler(
   req: NextApiRequest & {
@@ -1200,14 +1203,13 @@ async function handler(
 
     if (originalRescheduledBooking) {
       const bookingCreatedAt = dayjs(originalRescheduledBooking.createdAt);
-    
+
       // Check if rescheduling is allowed based on the event type settings
       const allowRescheduling = originalRescheduledBooking.eventType?.allowRescheduling;
       if (!isReschedulingAllowed(allowRescheduling, bookingCreatedAt.toDate())) {
         throw new HttpError({ statusCode: 400, message: "Rescheduling is not allowed for this booking" });
       }
     }
-
 
     if (!originalRescheduledBooking) {
       throw new HttpError({ statusCode: 404, message: "Could not find original booking" });
@@ -1448,9 +1450,9 @@ async function handler(
   // This ensures that createMeeting isn't called for static video apps as bookingLocation becomes just a regular value for them.
   const { bookingLocation, conferenceCredentialId } = organizerOrFirstDynamicGroupMemberDefaultLocationUrl
     ? {
-      bookingLocation: organizerOrFirstDynamicGroupMemberDefaultLocationUrl,
-      conferenceCredentialId: undefined,
-    }
+        bookingLocation: organizerOrFirstDynamicGroupMemberDefaultLocationUrl,
+        conferenceCredentialId: undefined,
+      }
     : getLocationValueForDB(locationBodyString, eventType.locations);
 
   const customInputs = getCustomInputsResponses(reqBody, eventType.customInputs);
@@ -1518,8 +1520,8 @@ async function handler(
   const destinationCalendar = eventType.destinationCalendar
     ? [eventType.destinationCalendar]
     : organizerUser.destinationCalendar
-      ? [organizerUser.destinationCalendar]
-      : null;
+    ? [organizerUser.destinationCalendar]
+    : null;
 
   let organizerEmail = organizerUser.email || "Email-less";
   if (eventType.useEventTypeDestinationCalendarEmail && destinationCalendar?.[0]?.primaryEmail) {
@@ -2189,8 +2191,8 @@ async function handler(
 
   const metadata = videoCallUrl
     ? {
-      videoCallUrl: getVideoCallUrlFromCalEvent(evt) || videoCallUrl,
-    }
+        videoCallUrl: getVideoCallUrlFromCalEvent(evt) || videoCallUrl,
+      }
     : undefined;
 
   const webhookData = {

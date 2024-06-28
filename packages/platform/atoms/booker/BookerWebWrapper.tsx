@@ -107,7 +107,7 @@ export const BookerWebWrapper = (props: BookerWebWrapperAtomProps) => {
   const monthCount =
     ((bookerLayout.layout !== BookerLayouts.WEEK_VIEW && bookerState === "selecting_time") ||
       bookerLayout.layout === BookerLayouts.COLUMN_VIEW) &&
-      dayjs(date).add(1, "month").month() !==
+    dayjs(date).add(1, "month").month() !==
       dayjs(date).add(bookerLayout.columnViewExtraDays.current, "day").month()
       ? 2
       : undefined;

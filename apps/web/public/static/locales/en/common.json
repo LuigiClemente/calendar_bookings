@@ -1,4 +1,17 @@
 {
+
+  "allow_rescheduling": "Allow Rescheduling",
+  "allow_rescheduling_description": "Limit how far in the future this event can be rescheduled",
+  "max_rescheduling_hours": "Maximum Rescheduling Hours",
+  "max_rescheduling_days": "Maximum Rescheduling Days",
+  "no_rescheduling_limit": "No Rescheduling Limit",
+  "allow_cancellation": "Allow Cancellation",
+  "allow_cancellation_description": "Limit how far in the future this event can be canceled",
+  "max_cancellation_hours": "Maximum Cancellation Hours",
+  "max_cancellation_days": "Maximum Cancellation Days",
+  "no_cancellation_limit": "No Cancellation Limit",
+  "cancellation_not_allowed": "Cancellation is not allowed for this booking",
+  "rescheduling_not_allowed": "Rescheduling is not allowed for this booking",
   
   "Home": "Home",
   "About_Us": "About Us",

@@ -240,13 +240,15 @@ export const KBarContent = () => {
     <KBarPortal>
       <KBarPositioner>
         <KBarAnimator className="bg-default z-10 w-full max-w-xl overflow-hidden rounded-xl shadow-lg">
-          <div className="border-subtle flex items-center justify-center border-b gap-4 px-4">
-            <Icon name="search" className="text-gray-400 dark:text-gray-300 w-5 block text-[13px]" />
+          <div className="border-subtle flex items-center justify-center gap-4 border-b px-4">
+            <Icon name="search" className="block w-5 text-[13px] text-gray-400 dark:text-gray-300" />
             <KBarSearch
               defaultPlaceholder={t("kbar_search_placeholder")}
-              className="h-8 w-full bg-transparent text-gray-600 placeholder-gray-400 focus:outline-none dark:text-gray-200 dark:placeholder-gray-500 border border-black focus:border-2 focus:border-[#2AE8D3] my-4 px-[0.75rem] py-[0.5rem]"
+              className="my-4 h-8 w-full border border-black bg-transparent px-[0.75rem] py-[0.5rem] text-gray-600 placeholder-gray-400 focus:border-2 focus:border-[#2AE8D3] focus:outline-none dark:text-gray-200 dark:placeholder-gray-500"
             />
-            <kbd className="inline-block whitespace-nowrap rounded border px-1.5 align-middle font-medium leading-4 tracking-wide text-xs text-gray-400 border-gray-400">ESC</kbd>
+            <kbd className="inline-block whitespace-nowrap rounded border border-gray-400 px-1.5 align-middle text-xs font-medium leading-4 tracking-wide text-gray-400">
+              ESC
+            </kbd>
           </div>
           <RenderResults />
           <div className="text-subtle border-subtle hidden items-center space-x-1 border-t px-2 py-1.5 text-xs sm:flex">
@@ -308,14 +310,16 @@ function RenderResults() {
       items={results}
       onRender={({ item, active }) =>
         typeof item === "string" ? (
-          <div className="bg-default text-emphasis p-4 text-xs font-bold uppercase !text-[#2AE8D3]">{t(item)}</div>
+          <div className="bg-default text-emphasis p-4 text-xs font-bold uppercase !text-[#2AE8D3]">
+            {t(item)}
+          </div>
         ) : (
           <div
             // For seeing keyboard up & down navigation in action, we need visual feedback based on "active" prop
             style={{
               background: active ? "#2AE8D3" : `var(--cal-bg-default)`,
-              
-              color:active ?"white" : "var(--cal-text)",
+
+              color: active ? "white" : "var(--cal-text)",
             }}
             className="flex items-center justify-between px-4 py-2.5 text-sm hover:cursor-pointer">
             <span>{t(item.name)}</span>

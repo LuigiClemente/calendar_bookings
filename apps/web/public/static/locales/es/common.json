@@ -1,4 +1,18 @@
 {
+
+  "allow_rescheduling": "Permitir Reprogramación",
+  "allow_rescheduling_description": "Limitar hasta qué punto en el futuro se puede reprogramar este evento",
+  "max_rescheduling_hours": "Horas Máximas de Reprogramación",
+  "max_rescheduling_days": "Días Máximos de Reprogramación",
+  "no_rescheduling_limit": "Sin Límite de Reprogramación",
+  "allow_cancellation": "Permitir Cancelación",
+  "allow_cancellation_description": "Limitar hasta qué punto en el futuro se puede cancelar este evento",
+  "max_cancellation_hours": "Horas Máximas de Cancelación",
+  "max_cancellation_days": "Días Máximos de Cancelación",
+  "no_cancellation_limit": "Sin Límite de Cancelación",
+  "cancellation_not_allowed": "La cancelación no está permitida para esta reserva",
+  "rescheduling_not_allowed": "La reprogramación no está permitida para esta reserva",
+
   "welcomeBack": "Bienvenido de nuevo",
 "forgotPassword": "Olvidé mi contraseña",
 "forgetPasswordPage": {

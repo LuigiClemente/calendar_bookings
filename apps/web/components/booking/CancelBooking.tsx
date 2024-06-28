@@ -51,7 +51,7 @@ export default function CancelBooking(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(error)
+  console.log(error);
 
   return (
     <>
@@ -91,9 +91,9 @@ export default function CancelBooking(props: Props) {
                 data-testid="confirm_cancel"
                 onClick={async () => {
                   setLoading(true);
-                
+
                   telemetry.event(telemetryEventTypes.bookingCancelled, collectPageParameters());
-                
+
                   try {
                     const res = await fetch("/api/cancel", {
                       body: JSON.stringify({
@@ -108,12 +108,12 @@ export default function CancelBooking(props: Props) {
                       },
                       method: "POST",
                     });
-                
+
                     const bookingWithCancellationReason = {
                       ...(bookingCancelledEventProps.booking as object),
                       cancellationReason,
                     } as unknown;
-                
+
                     if (res.status >= 200 && res.status < 300) {
                       // tested by apps/web/playwright/booking-pages.e2e.ts
                       sdkActionManager?.fire("bookingCancelled", {
@@ -129,7 +129,7 @@ export default function CancelBooking(props: Props) {
                     console.error("Error cancelling booking:", error);
                     setError(t("something_went_wrong"));
                   }
-                
+
                   setLoading(false);
                 }}
                 loading={loading}>

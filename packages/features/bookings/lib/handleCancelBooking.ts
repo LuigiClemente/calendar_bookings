@@ -135,13 +135,16 @@ export type CustomRequest = NextApiRequest & {
 };
 
 function isCancellationAllowed(
-  allowCancellation: {
-    id: number;
-    enabled: boolean;
-    maxHours: number | null;
-    maxDays: number | null;
-    noLimit: boolean;
-  } | null | undefined,
+  allowCancellation:
+    | {
+        id: number;
+        enabled: boolean;
+        maxHours: number | null;
+        maxDays: number | null;
+        noLimit: boolean;
+      }
+    | null
+    | undefined,
   originalBookingCreatedTime: Date
 ): boolean {
   if (!allowCancellation || !allowCancellation.enabled) {
@@ -150,7 +153,7 @@ function isCancellationAllowed(
 
   const now = dayjs();
   const bookingCreatedAt = dayjs(originalBookingCreatedTime);
-  const hoursSinceCreation = now.diff(bookingCreatedAt, 'hour');
+  const hoursSinceCreation = now.diff(bookingCreatedAt, "hour");
 
   if (allowCancellation.noLimit) {
     return true;
@@ -172,8 +175,6 @@ async function handler(req: CustomRequest) {
     schemaBookingCancelParams.parse(req.body);
   req.bookingToDelete = await getBookingToDelete(id, uid);
 
-
-
   const {
     bookingToDelete,
     userId,
@@ -182,8 +183,6 @@ async function handler(req: CustomRequest) {
     platformClientId,
     platformRescheduleUrl,
   } = req;
-
-
 
   if (!bookingToDelete || !bookingToDelete.user) {
     throw new HttpError({ statusCode: 400, message: "Booking not found" });
@@ -320,8 +319,8 @@ async function handler(req: CustomRequest) {
     destinationCalendar: bookingToDelete?.destinationCalendar
       ? [bookingToDelete?.destinationCalendar]
       : bookingToDelete?.user.destinationCalendar
-        ? [bookingToDelete?.user.destinationCalendar]
-        : [],
+      ? [bookingToDelete?.user.destinationCalendar]
+      : [],
     cancellationReason: cancellationReason,
     ...(teamMembers && {
       team: { name: bookingToDelete?.eventType?.team?.name || "Nameless", members: teamMembers, id: teamId! },
