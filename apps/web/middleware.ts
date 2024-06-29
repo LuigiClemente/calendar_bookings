@@ -58,6 +58,19 @@ const middleware = async (req: NextRequest): Promise<NextResponse<unknown>> => {
     return res;
   }
 
+  // Handle login routing
+  if (url.pathname === "/login" || url.pathname === "/auth/login") {
+    if (process.env.NODE_ENV === "production") {
+      // Redirect to new login page in production
+      url.pathname = "/auth/login-new";
+      return NextResponse.redirect(url);
+    } else if (process.env.NODE_ENV !== "development") {
+      // Block access to old login page in non-development environments
+      return NextResponse.redirect(new URL("/auth/login-new", req.url));
+    }
+    // In development mode, allow access to both old and new login pages
+  }
+
   if (url.pathname.startsWith("/api/trpc/")) {
     requestHeaders.set("x-cal-timezone", req.headers.get("x-vercel-ip-timezone") ?? "");
   }
@@ -70,7 +83,7 @@ const middleware = async (req: NextRequest): Promise<NextResponse<unknown>> => {
     }
   }
 
-  if (url.pathname.startsWith("/auth/login") || url.pathname.startsWith("/login")) {
+  if (url.pathname.startsWith("/auth/login-new") || url.pathname.startsWith("/login-new")) {
     // Use this header to actually enforce CSP, otherwise it is running in Report Only mode on all pages.
     requestHeaders.set("x-csp-enforce", "true");
   }
@@ -129,6 +142,7 @@ export const config = {
     "/login",
     "/auth/login",
     "/auth/login2",
+    "/auth/login-new",
 
     "/future/auth/login",
     /**

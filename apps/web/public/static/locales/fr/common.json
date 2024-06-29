@@ -11,7 +11,7 @@
   "max_cancellation_days": "Jours Maximaux d'Annulation",
   "no_cancellation_limit": "Aucune Limite d'Annulation",
   "cancellation_not_allowed": "L'annulation n'est pas autorisée pour cette réservation",
-  "rescheduling_not_allowed": "Le replanning n'est pas autorisé pour cette réservation"
+  "rescheduling_not_allowed": "Le replanning n'est pas autorisé pour cette réservation",
 
 "welcomeBack": "Bienvenue de nouveau",
 "forgotPassword": "Mot de passe oublié",
